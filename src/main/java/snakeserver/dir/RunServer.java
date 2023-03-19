@@ -1,13 +1,14 @@
-package pentasnake.server.snakeserver;
+package snakeserver.dir;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SnakeServerApplication {
+public class RunServer
+{
 
     public static void main(String[] args) {
-        SpringApplication.run(SnakeServerApplication.class, args);
+        SpringApplication.run(RunServer.class, args);
     }
 
 }
