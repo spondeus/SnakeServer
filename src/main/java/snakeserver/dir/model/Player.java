@@ -12,7 +12,6 @@ import java.util.List;
 @Setter
 @Getter
 @NoArgsConstructor
-@RequiredArgsConstructor
 @Entity
 @Table(name = "snake_player")
 public class Player {
