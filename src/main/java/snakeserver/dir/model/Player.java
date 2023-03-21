@@ -38,6 +38,6 @@ public class Player {
             joinColumns = @JoinColumn(name = "snake_player_id"),
             inverseJoinColumns = @JoinColumn(name = "snake_game_id")
     )
-    private List<Score> scores;
+    private List<Game> games;
 
 }
