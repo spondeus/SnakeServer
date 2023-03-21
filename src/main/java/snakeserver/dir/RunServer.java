@@ -1,34 +1,24 @@
 package snakeserver.dir;
 
-import com.esotericsoftware.kryonet.Server;
-import jakarta.annotation.PreDestroy;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
+import lombok.val;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import snakeserver.dir.server.ServerController;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import snakeserver.dir.server.ServerTest;
 
-import java.security.SecureRandom;
+import java.net.InetSocketAddress;
 
 @SpringBootApplication
-public class RunServer implements ApplicationRunner {
-
-    @Autowired
-    private Server kryonetServer;
+public class RunServer {
 
     public static void main(String[] args) {
         SpringApplication.run(RunServer.class, args);
-    }
-
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
 
     }
 
-    @PreDestroy
-    public void stop() {
-        kryonetServer.stop();
-    }
+
+
 }
+
+
