@@ -8,6 +8,6 @@ import java.net.InetSocketAddress;
 @Component
 public class InetSocket extends InetSocketAddress{
     public InetSocket(){
-        super("localhost", 8082);
+        super("localhost", 8080);
     }
 }
