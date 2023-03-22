@@ -416,7 +416,7 @@ public class Snake {
 
     @Override
     public String toString() {
-        String str= String.format("%d,%d,%d,",id,speed,points);
+        String str= String.format("%d#%d#%d#",id,speed,points);
         for (SnakePart part:parts) {
             str+= part.toString();
         }

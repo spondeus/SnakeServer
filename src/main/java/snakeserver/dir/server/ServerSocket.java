@@ -45,6 +45,9 @@ public class ServerSocket extends WebSocketServer{
         val newClient = new Client(clientAddress, webSocket);
         clients.add(newClient);
 
+        webSocket.send(new Snake(1,100,100,20,Color.RED).toString());
+
+
         for(var x: clients){
             if(webSocket != x.getWebSocket())
                 x.getWebSocket().send("new player joined");
@@ -63,7 +66,7 @@ public class ServerSocket extends WebSocketServer{
     @Override
     public void onMessage(WebSocket webSocket, String s){
         System.out.println(webSocket.getRemoteSocketAddress() + ": " + s);
-        Client sender=getClient(webSocket);
+//        Client sender=getClient(webSocket);
 
 
     }

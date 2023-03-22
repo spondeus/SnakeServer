@@ -38,7 +38,7 @@ public class SnakePart{
 
     @Override
     public String toString() {
-        return String.format("[%f:%f:%f:%s:%s]",
+        return String.format("_%f:%f:%f:%s:%s",
                 x,y,radius,color.toString(),direction.toString());
     }
 }
