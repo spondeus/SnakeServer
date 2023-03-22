@@ -4,14 +4,8 @@ import lombok.val;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
-import org.springframework.context.event.ApplicationContextEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,8 +15,6 @@ public class ServerSocket extends WebSocketServer{
     public static ServerSocket socket;
 
     private final List<Client> clients = new ArrayList<>();
-
-
 
     public ServerSocket(InetSocket address){
         super(address);
@@ -48,6 +40,9 @@ public class ServerSocket extends WebSocketServer{
                 x.getWebSocket().send("new player joined");
         }
 
+        webSocket.send("you're the: "+clients.size()+". player in the lobby");
+
+
     }
 
     @Override
@@ -62,6 +57,10 @@ public class ServerSocket extends WebSocketServer{
     public void onMessage(WebSocket webSocket, String s){
         System.out.println(webSocket.getRemoteSocketAddress() + ": " + s);
         webSocket.send("ANYADAT LBGDX");
+
+        for(var x: clients){
+            x.getWebSocket().send("cons,"+s);
+        }
 
     }
 
