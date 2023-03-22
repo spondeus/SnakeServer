@@ -7,7 +7,9 @@ import org.java_websocket.server.WebSocketServer;
 import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import snakeserver.dir.util.Snake;
 
+import java.awt.*;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -61,13 +63,21 @@ public class ServerSocket extends WebSocketServer{
     @Override
     public void onMessage(WebSocket webSocket, String s){
         System.out.println(webSocket.getRemoteSocketAddress() + ": " + s);
-        webSocket.send("ANYADAT LBGDX");
+        Client sender=getClient(webSocket);
 
+
+    }
+
+    private Client getClient(WebSocket webSocket) {
+        for (Client client:clients) {
+            if(client.getWebSocket().equals(webSocket)) return client;
+        }
+        return null;
     }
 
     @Override
     public void onError(WebSocket webSocket, Exception e){
-
+        e.printStackTrace();
     }
 
     @Override
@@ -78,5 +88,6 @@ public class ServerSocket extends WebSocketServer{
                                     Server Started
                             ////////////////////////////////
                             """);
+        System.out.println(new Snake(1,100,100,20, Color.BLUE));
     }
 }
