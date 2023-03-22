@@ -18,11 +18,11 @@ public class Score {
 
     @ManyToOne
     @MapsId("snake_player_id")
-    private Player player_id;
+    private Player player;
 
     @ManyToOne
     @MapsId("snake_game_id")
-    private Game game_id;
+    private Game game;
 
     private Long score;
 

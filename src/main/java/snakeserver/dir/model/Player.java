@@ -32,12 +32,7 @@ public class Player {
 
     private boolean enable = false;
 
-    @ManyToMany
-    @JoinTable(
-            name = "snake_score",
-            joinColumns = @JoinColumn(name = "snake_player_id"),
-            inverseJoinColumns = @JoinColumn(name = "snake_game_id")
-    )
-    private List<Game> games;
+    @OneToMany(mappedBy = "player")
+    private List<Score> scores;
 
 }

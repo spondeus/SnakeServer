@@ -25,7 +25,7 @@ public class Game {
 
     private  boolean type;
 
-    @ManyToMany(mappedBy = "games")
-    private List<Player> players;
+    @OneToMany(mappedBy = "game")
+    private List<Score> scores;
 
 }
