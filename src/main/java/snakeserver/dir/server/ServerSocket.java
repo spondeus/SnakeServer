@@ -64,7 +64,7 @@ public class ServerSocket extends WebSocketServer{
         System.out.println(webSocket.getRemoteSocketAddress() + ": " + s);
 
 
-        if(s.startsWith("cons")){
+        if(s.startsWith("cons")){       // SNAKE CONSTRUCT MESSAGE HANDLER
             val xCord = new Random().nextInt(100,500);
             val yCord = new Random().nextInt(100,500);
 
@@ -84,7 +84,7 @@ public class ServerSocket extends WebSocketServer{
             System.out.println(builder.substring(0, builder.length()));
         }
 
-        if(clients.size() == 1){
+        if(clients.size() == 1){        // LOBBY SIZE
             val string = new StringBuilder();
             string.append("cons#");
 
@@ -100,16 +100,16 @@ public class ServerSocket extends WebSocketServer{
 
     @Override
     public void onError(WebSocket webSocket, Exception e){
-
+        e.printStackTrace();
     }
 
     @Override
     public void onStart(){
         System.out.println(
                 """
-                    ////////////////////////////////
+                    ================================
                             Server Started
-                    ////////////////////////////////
+                    ================================
                     """);
     }
 }
