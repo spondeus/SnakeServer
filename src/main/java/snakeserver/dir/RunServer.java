@@ -4,6 +4,8 @@ import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
 import snakeserver.dir.server.ServerSocket;
 
@@ -23,24 +25,7 @@ public class RunServer {
 
     }
 
-    private void restartServer(){
-        val scn = new Scanner(System.in);
-        while(true) {
-            String command = scn.nextLine();
 
-            switch (command) {
-                case "restart_server"->{
-                    try{
-                        socket.stop();
-                        socket.start();
-                        System.out.println("[Console]: Server restarted");
-                    } catch (IOException | InterruptedException e){
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        }
-    }
 }
 
 
