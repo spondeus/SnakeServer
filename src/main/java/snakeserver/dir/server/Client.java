@@ -16,6 +16,7 @@ public class Client{
     }
 
     private InetSocketAddress remoteAddress;
+    private int id;
 
     private boolean goLeft;
     private boolean goRight;

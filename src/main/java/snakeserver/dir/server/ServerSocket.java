@@ -16,11 +16,15 @@ import java.util.*;
 @Component
 public class ServerSocket extends WebSocketServer{
 
+    public int lobbySize = 1;   // LOBBY SIZE
+
     public static ServerSocket socket;
 
     private final List<Client> clients = new ArrayList<>();
 
     private Map<WebSocket,String> snakeConstructs = new HashMap<>();
+
+    private Set<Integer> ids = new HashSet<>();
 
     public ServerSocket(InetSocket address){
         super(address);
@@ -39,6 +43,18 @@ public class ServerSocket extends WebSocketServer{
         val clientAddress = webSocket.getRemoteSocketAddress();
         System.out.println("Client connected: "+ clientAddress);
         val newClient = new Client(clientAddress, webSocket);
+
+        while(true){
+            Integer random = new Random().nextInt(1,10);
+            if(!ids.contains(random)){
+                ids.add(random);
+                newClient.setId(random);
+                break;
+            }
+        }
+
+        webSocket.send("id#"+newClient.getId());
+
         clients.add(newClient);
 
         for(var x: clients){
@@ -53,6 +69,11 @@ public class ServerSocket extends WebSocketServer{
     @Override
     public void onClose(WebSocket webSocket, int i, String s, boolean b){
         val clientAddress = webSocket.getRemoteSocketAddress();
+
+        for(var x:clients)
+            if (x.getWebSocket() == webSocket)
+                ids.remove(x.getId());
+
         clients.removeIf(x -> x.getRemoteAddress() == clientAddress);
 
         System.out.println("Client disconnected: "+ clientAddress);
@@ -99,7 +120,7 @@ public class ServerSocket extends WebSocketServer{
             System.out.println(builder.substring(0, builder.length()));
         }
 
-        if(clients.size() == 2){        // LOBBY SIZE
+        if(clients.size() == lobbySize){        // LOBBY SIZE
             val string = new StringBuilder();
             string.append("cons#");
 
