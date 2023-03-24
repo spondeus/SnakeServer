@@ -4,9 +4,13 @@ import lombok.val;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import javax.print.DocFlavor;
+import java.io.IOException;
 import java.util.*;
 
 @Component
@@ -62,14 +66,25 @@ public class ServerSocket extends WebSocketServer{
     @Override
     public void onMessage(WebSocket webSocket, String s){
         System.out.println(webSocket.getRemoteSocketAddress() + ": " + s);
+        val builder = new StringBuilder();
+
+        if(s.startsWith("input")){       // SNAKE INPUT HANDLER
+            val msg = s.substring(5);
+            val split = msg.split(",");
+            builder.append("input#");
+            for(var x: split){
+                builder.append(x).append("#");
+            }
+            for(var client: clients){
+                client.getWebSocket().send(builder.toString());
+            }
+        }
 
 
         if(s.startsWith("cons")){       // SNAKE CONSTRUCT MESSAGE HANDLER
             val xCord = new Random().nextInt(100,500);
             val yCord = new Random().nextInt(100,500);
-
             val msg = s.substring(4);
-            val builder = new StringBuilder();
             val split = msg.split(",");
             for(var x: split){
                 if(x.equals("?1")){
