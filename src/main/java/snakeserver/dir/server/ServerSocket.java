@@ -99,7 +99,7 @@ public class ServerSocket extends WebSocketServer{
             System.out.println(builder.substring(0, builder.length()));
         }
 
-        if(clients.size() == 1){        // LOBBY SIZE
+        if(clients.size() == 2){        // LOBBY SIZE
             val string = new StringBuilder();
             string.append("cons#");
 
