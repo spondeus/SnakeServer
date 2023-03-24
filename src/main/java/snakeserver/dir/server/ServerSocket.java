@@ -16,7 +16,7 @@ import java.util.*;
 @Component
 public class ServerSocket extends WebSocketServer{
 
-    public int lobbySize = 2;   // LOBBY SIZE
+    public int lobbySize = 1;   // LOBBY SIZE
 
     public static ServerSocket socket;
 
