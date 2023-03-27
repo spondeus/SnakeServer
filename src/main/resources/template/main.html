@@ -1,0 +1,155 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html lang="en" id="main" data-theme="dark" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+  
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="node_modules/@picocss/pico/css/pico.min.css">
+    <title>PentaSnake</title>
+    <style>
+      * a{
+        user-select: none;
+      }
+      #nav-links a{
+        color: #d3d3d3;
+      }
+      nav a{
+        margin-left: 10px;
+        vertical-align: sub;
+      }
+      .container{
+        max-height: max-content;
+        margin: 0 auto;
+      }
+      .login{
+        display: none;
+        margin: auto;
+        width: 50%;
+        outline: .3rem solid;
+        outline-color: #0c96bf;
+        outline-offset: 7px;
+        align-items: center;
+        align-content: center;
+        text-align: center;
+      }
+      .login h3{
+        text-align: center;
+        font-size: 1.7rem;
+      }
+      .login input{
+        text-align: center
+      }
+      .login button{
+        width: 50%;
+      }
+      #play{
+        width: 150%;
+      }
+      .buttons{
+        display: flex;
+      }
+
+      footer{
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+    </style>
+</head>
+
+<body>
+  
+  <header>
+    <nav class="container">
+      <ul>
+        <li><strong style="font-size: 1.5rem;">PentaSnake</strong></li>
+        <li><a id="play" th:if="${}" href="" role="button" class="contrast outline">Play</a></li>
+      </ul>
+      <ul id="nav-links">
+        <li><a href="#" onclick="showLogin()">Login</a></li>
+        <li><a href="">Register</a></li>
+        <li><a th:if="${}" href="">Logout</a></li>
+        <li><a href="">About</a></li>
+      </ul>
+    </nav>
+      
+  </header>
+  
+  <main class="container">
+    <section class="login" id="login">
+      <h3>Log in</h3>
+      <form action="@{/login}" method="post">
+        <label for="username"></label>
+        <input type="text" name="username" id="username" placeholder="Username" required>
+        
+        <label for="password"></label>
+        <input type="password" name="password" id="password" placeholder="Password" required>
+        
+        <div class="login-buttons">
+          <button type="submit" value="Login" role="button" class="contrast outline">Login</button>
+          <button type="button" value="forgor" role="button" class="contrast outline">Forgot Password</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <footer class="container">
+    <label for="switch" class=""></label>
+    <input onclick="switchTheme()" id="switch" type="checkbox" name="switch" role="switch">Light
+  </footer>
+
+  <script>
+    var body = document.getElementById("main")
+    var login = document.getElementById("login")
+    var navLinks = document.getElementById("nav-links")
+    
+    function switchTheme() {
+      var dataTheme = body.getAttribute("data-theme")
+      if(dataTheme === "dark"){
+        body.setAttribute("data-theme", "light")
+        login.style.outlineColor = "black"
+        //nav link color
+        navLinks.querySelectorAll("a").forEach(function(link){
+          link.style.color = "black"
+        })
+      }
+      if(dataTheme === "light"){
+        body.setAttribute("data-theme", "dark")
+        login.style.outlineColor = "#0c96bf"
+        //nav link color
+        navLinks.querySelectorAll("a").forEach(function(link){
+          link.style.color = "#d3d3d3"
+        })
+      }
+    }
+    
+    function closeList() {
+      var details = document.querySelector("details[role='list']");
+      details.removeAttribute("open");
+    }
+
+    function showLogin() {
+      if(login.style.display == "grid"){
+        login.style.transition = "opacity 0.5s ease-in-out";
+        login.style.opacity = "0";
+        setTimeout(() => {
+          login.style.display = "none";
+          login.style.opacity = "1";
+          login.style.transition = "";
+        }, 500);
+      } else {
+        login.style.transition = "opacity 0.5s ease-in-out";
+        login.style.opacity = "0";
+        login.style.display = "grid";
+        setTimeout(() => {
+          login.style.opacity = "1";
+        }, 500);
+      }
+    }
+  </script>
+
+</body>
+
+</html>
