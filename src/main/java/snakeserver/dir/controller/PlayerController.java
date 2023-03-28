@@ -1,9 +1,11 @@
 package snakeserver.dir.controller;
 
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import snakeserver.dir.authetication.PlayerService;
 import snakeserver.dir.model.Player;
 import snakeserver.dir.model.PlayerRepository;
+
+import java.security.Principal;
 
 @Controller
 public class PlayerController {
@@ -43,11 +47,17 @@ public class PlayerController {
             @ModelAttribute("newuser")
             @Validated
             RegistrationForm registrationForm,
-            BindingResult bind
+            BindingResult bind,
+            Principal principal
     ) {
         if (bind.hasErrors()) {
             return "registration-form";
         }
+//        if (bind.hasErrors() || !PlayerService.isUniqueUsername(registrationForm.getName())) {
+//            ObjectError objectError = new ObjectError("ERROR", "Player Name exists!");
+//            bind.addError(objectError);
+//            return "registration-form";
+//        }
 
 
         Player player = new Player();
