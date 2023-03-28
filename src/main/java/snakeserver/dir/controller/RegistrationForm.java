@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.UniqueElements;
 
 @Getter
 @Setter
@@ -15,8 +14,8 @@ public class RegistrationForm {
     @Size(min = 6, max = 20, message = "A Player Name méretnek 6 és 20 karakter között kell lennie!")
     private String name;
 
-    @Pattern(regexp = "^(?=.*?[a-zA-Z])X+(?=.*?[0-9])X+.{6,30}$",
-            message = "A jelszó minimum 6 karakter, tartalmaznia kell 1 kisbetűt, 1 nagybetűt és 1 számot!")
+    @Pattern(regexp = "^(?=.*?[a-zA-Z])+(?=.*?[0-9]){2,}.{6,30}$",
+            message = "A jelszó minimum 6 karakter, tartalmaznia kell 1 kisbetűt, 1 nagybetűt és 2 számot!")
     private String password;
 
     @Email

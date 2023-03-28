@@ -2,11 +2,9 @@ package snakeserver.dir.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,14 +27,15 @@ public class Player implements UserDetails {
     private Long id;
 
     @Size(min = 6, max = 20)
-    @UniqueElements
+
+    @Column(unique = true)
     private String name;
 
-    @Pattern(regexp = "^(?=.*?[a-zA-Z])X+(?=.*?[0-9])X+.{6,30}$")
+    @Pattern(regexp = "^(?=.*?[a-zA-Z])+(?=.*?[0-9]){2,}.{6,30}$")
     private String password;
 
     @Email
-    @UniqueElements
+    @Column(unique = true)
     private String email;
 
     private boolean enable = false;

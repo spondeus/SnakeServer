@@ -19,6 +19,7 @@
             data-th-if="${#fields.hasErrors('name')}"
             data-th-errors="*{name}"
     ></p>
+<!--    <p th:if="${dbError}" class="error">Wrong user or password</p>-->
 
     <label for="email">Email</label>
     <input id="email" type="email" data-th-field="*{email}">

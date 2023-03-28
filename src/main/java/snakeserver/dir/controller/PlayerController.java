@@ -1,5 +1,6 @@
 package snakeserver.dir.controller;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
@@ -48,16 +49,11 @@ public class PlayerController {
             @Validated
             RegistrationForm registrationForm,
             BindingResult bind,
-            Principal principal
+            Model model
     ) {
         if (bind.hasErrors()) {
             return "registration-form";
         }
-//        if (bind.hasErrors() || !PlayerService.isUniqueUsername(registrationForm.getName())) {
-//            ObjectError objectError = new ObjectError("ERROR", "Player Name exists!");
-//            bind.addError(objectError);
-//            return "registration-form";
-//        }
 
 
         Player player = new Player();
@@ -66,9 +62,16 @@ public class PlayerController {
         player.setPassword(BCrypt.hashpw(registrationForm.getPassword(), BCrypt.gensalt()));
 
         playerRepository.save(player);
-
         return "redirect:/home";
-    }
+//        try {
+//            playerRepository.save(player);
+//            return "redirect:/home";
+//        } catch (DataAccessException e){
+//            model.addAttribute("dbError", e.getMessage());
+//            return "registration-form";
+//    }
+        }
+
 
     @GetMapping(path={"/login"})
     public String loginPage() {
