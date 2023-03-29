@@ -63,7 +63,7 @@ public class ServerSocket extends WebSocketServer {
 //        webSocket.send("id#"+newClient.getId());
         JsonObject jsonObject = new JsonObject();
         jsonObject.add("id", new JsonPrimitive(1));
-        jsonObject.add("id", new JsonPrimitive("id"));
+        jsonObject.add("type", new JsonPrimitive("id"));
         String msg = gson.toJson(jsonObject);
         webSocket.send(msg);
 
@@ -100,7 +100,9 @@ public class ServerSocket extends WebSocketServer {
     public void onMessage(WebSocket webSocket, String s) {
         System.out.println(webSocket.getRemoteSocketAddress() + ": " + s);
         readMsg(s);
-        writeMsg(1,new SnakeConstruct(10,10,10, Color.BLUE));
+//        writeMsg(1,new SnakeConstruct(10,10,10, Color.BLUE));
+
+
 
 //        val builder = new StringBuilder();
 
@@ -192,6 +194,12 @@ public class ServerSocket extends WebSocketServer {
         int clientId = cId.getAsInt();
         JsonElement msgType = jsonObject.get("type");
         String type = msgType.getAsString();
+        if(type.equals("snakeMove")) {
+            for (var x : clients) {
+                x.getWebSocket().send(s);
+            }
+            return;
+        }
         JsonObject innerJson;
         if (type.startsWith("snake")) {
             if (type.equals("snakeMove")) {
