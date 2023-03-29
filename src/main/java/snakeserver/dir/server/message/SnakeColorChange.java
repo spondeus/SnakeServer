@@ -1,6 +1,6 @@
 package snakeserver.dir.server.message;
 
-import java.awt.*;
+import com.badlogic.gdx.graphics.Color;
 
 public class SnakeColorChange extends Message {
 
@@ -37,5 +37,14 @@ public class SnakeColorChange extends Message {
 
     public void setSecond(Integer second) {
         this.second = second;
+    }
+
+    @Override
+    public String toString() {
+        return "SnakeColorChange{" +
+                "newColor=" + newColor +
+                ", first=" + first +
+                ", second=" + second +
+                '}';
     }
 }

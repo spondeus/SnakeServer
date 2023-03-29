@@ -10,10 +10,13 @@ import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 import org.springframework.stereotype.Component;
 import snakeserver.dir.server.message.Message;
+import com.badlogic.gdx.graphics.Color;
 import snakeserver.dir.server.message.SnakeConstruct;
 import snakeserver.dir.server.message.SnakeMove;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 @Component
 public class ServerSocket extends WebSocketServer {
@@ -97,6 +100,8 @@ public class ServerSocket extends WebSocketServer {
     public void onMessage(WebSocket webSocket, String s) {
         System.out.println(webSocket.getRemoteSocketAddress() + ": " + s);
         readMsg(s);
+        writeMsg(1,new SnakeConstruct(10,10,10, Color.BLUE));
+
 //        val builder = new StringBuilder();
 
 
@@ -170,6 +175,7 @@ public class ServerSocket extends WebSocketServer {
         else if (msgObj instanceof SnakeConstruct) type = "snakeConstruct";
         else type = "id";
         jsonObject.add("type", new JsonPrimitive(type));
+        String color=gson.toJson(Color.RED);
         String innerJson = gson.toJson(msgObj);
         jsonObject.add("data", new JsonPrimitive(innerJson));
         String msg = gson.toJson(jsonObject);
@@ -186,11 +192,11 @@ public class ServerSocket extends WebSocketServer {
         int clientId = cId.getAsInt();
         JsonElement msgType = jsonObject.get("type");
         String type = msgType.getAsString();
+        JsonObject innerJson;
         if (type.startsWith("snake")) {
             if (type.equals("snakeMove")) {
-                JsonElement data = jsonObject.get("data");
-                SnakeMove snakeMove = gson.fromJson(data, SnakeMove.class);
-                System.out.println(snakeMove);
+                String dataStr= jsonObject.get("data").getAsString();
+                SnakeMove snakeMove = gson.fromJson(dataStr, SnakeMove.class);
             }
         }
 

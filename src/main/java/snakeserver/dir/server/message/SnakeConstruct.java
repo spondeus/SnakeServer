@@ -1,7 +1,6 @@
 package snakeserver.dir.server.message;
 
-
-import java.awt.*;
+import com.badlogic.gdx.graphics.Color;
 
 public class SnakeConstruct extends Message {
     private int x;
