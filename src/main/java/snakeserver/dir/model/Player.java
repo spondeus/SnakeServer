@@ -27,11 +27,9 @@ public class Player implements UserDetails {
     private Long id;
 
     @Size(min = 6, max = 20)
-
     @Column(unique = true)
     private String name;
 
-    @Pattern(regexp = "^(?=.*?[a-zA-Z])+(?=.*?[0-9]){2,}.{6,30}$")
     private String password;
 
     @Email

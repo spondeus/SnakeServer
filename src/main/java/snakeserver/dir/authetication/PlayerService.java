@@ -28,12 +28,4 @@ public class PlayerService implements UserDetailsService {
     }
 
 
-//    public static UserDetails isUniqueUsername(String name) throws UsernameNotFoundException {
-//        return playerRepository.findByName(name)
-//                .orElseThrow(
-//                        () -> new UsernameNotFoundException(
-//                                String.format(USER_FOUND_MSG, name)
-//                        )
-//                );
-//    }
 }

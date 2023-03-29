@@ -1,5 +1,7 @@
 package snakeserver.dir.controller;
 
+import jakarta.validation.ConstraintViolation;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -61,15 +63,15 @@ public class PlayerController {
         player.setEmail(registrationForm.getEmail());
         player.setPassword(BCrypt.hashpw(registrationForm.getPassword(), BCrypt.gensalt()));
 
-        playerRepository.save(player);
-        return "redirect:/home";
-//        try {
-//            playerRepository.save(player);
-//            return "redirect:/home";
-//        } catch (DataAccessException e){
-//            model.addAttribute("dbError", e.getMessage());
-//            return "registration-form";
-//    }
+
+        try {
+            playerRepository.save(player);
+            return "redirect:/home";
+        } catch (DataAccessException e) {
+            if (e.getMessage().contains("snake_player.name")) model.addAttribute("nameError", e.getMessage());
+            if (e.getMessage().contains("snake_player.email")) model.addAttribute("emailError", e.getMessage());
+            return "registration-form";
+        }
         }
 
 
