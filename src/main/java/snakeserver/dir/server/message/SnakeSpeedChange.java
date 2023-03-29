@@ -14,4 +14,11 @@ public class SnakeSpeedChange extends Message {
     public void setChange(int change) {
         this.change = change;
     }
+
+    @Override
+    public String toString() {
+        return "SnakeSpeedChange{" +
+                "change=" + change +
+                '}';
+    }
 }

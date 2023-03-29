@@ -11,6 +11,7 @@ import org.java_websocket.server.WebSocketServer;
 import org.springframework.stereotype.Component;
 import snakeserver.dir.server.message.Message;
 import com.badlogic.gdx.graphics.Color;
+import snakeserver.dir.server.message.SnakeColorChange;
 import snakeserver.dir.server.message.SnakeConstruct;
 import snakeserver.dir.server.message.SnakeMove;
 
@@ -28,6 +29,7 @@ public class ServerSocket extends WebSocketServer {
     private final List<Client> clients = new ArrayList<>();
 
     private Map<WebSocket, String> snakeConstructs = new HashMap<>();
+    private Queue<SnakeConstruct> snakeConstructs2 = new ArrayDeque<>();
 
     private Set<Integer> ids = new HashSet<>();
 
@@ -51,18 +53,21 @@ public class ServerSocket extends WebSocketServer {
         System.out.println("Client connected: " + clientAddress);
         val newClient = new Client(clientAddress, webSocket);
 
-        while (true) {
-            Integer random = new Random().nextInt(1, 10);
-            if (!ids.contains(random)) {
-                ids.add(random);
-                newClient.setId(random);
-                break;
-            }
-        }
+//        while (true) {
+//            Integer random = new Random().nextInt(1, 10);
+//            if (!ids.contains(random)) {
+//                ids.add(random);
+//                newClient.setId(random);
+//                break;
+//            }
+//        }
+        newClient.setId(ids.size());
+        ids.add(ids.size());
+
 
 //        webSocket.send("id#"+newClient.getId());
         JsonObject jsonObject = new JsonObject();
-        jsonObject.add("id", new JsonPrimitive(1));
+        jsonObject.add("id", new JsonPrimitive(newClient.getId()));
         jsonObject.add("type", new JsonPrimitive("id"));
         String msg = gson.toJson(jsonObject);
         webSocket.send(msg);
@@ -101,7 +106,6 @@ public class ServerSocket extends WebSocketServer {
         System.out.println(webSocket.getRemoteSocketAddress() + ": " + s);
         readMsg(s);
 //        writeMsg(1,new SnakeConstruct(10,10,10, Color.BLUE));
-
 
 
 //        val builder = new StringBuilder();
@@ -177,7 +181,7 @@ public class ServerSocket extends WebSocketServer {
         else if (msgObj instanceof SnakeConstruct) type = "snakeConstruct";
         else type = "id";
         jsonObject.add("type", new JsonPrimitive(type));
-        String color=gson.toJson(Color.RED);
+        String color = gson.toJson(Color.RED);
         String innerJson = gson.toJson(msgObj);
         jsonObject.add("data", new JsonPrimitive(innerJson));
         String msg = gson.toJson(jsonObject);
@@ -190,23 +194,56 @@ public class ServerSocket extends WebSocketServer {
     public void readMsg(String s) {
         System.out.println(" got:" + s);
         JsonObject jsonObject = gson.fromJson(s, JsonObject.class);
+        // process header
         JsonElement cId = jsonObject.get("id");
         int clientId = cId.getAsInt();
         JsonElement msgType = jsonObject.get("type");
         String type = msgType.getAsString();
-        if(type.equals("snakeMove")) {
+        if (type.equals("snakeMove")) {     // only forwarding
             for (var x : clients) {
+                System.out.println("sent:" + s);
                 x.getWebSocket().send(s);
             }
             return;
         }
+        // process body
         JsonObject innerJson;
         if (type.startsWith("snake")) {
-            if (type.equals("snakeMove")) {
-                String dataStr= jsonObject.get("data").getAsString();
-                SnakeMove snakeMove = gson.fromJson(dataStr, SnakeMove.class);
+            if (type.equals("snakeColorChange")) {
+                String data = jsonObject.get("data").getAsString();
+                SnakeColorChange snakeColorChange = gson.fromJson(data, SnakeColorChange.class);
+                if (snakeColorChange.getFirst() == -1) { // starter color
+                    val xCord = new Random().nextInt(100, 500);
+                    val yCord = new Random().nextInt(100, 500);
+                    snakeConstructs2.add(new SnakeConstruct(xCord, yCord, 20, snakeColorChange.getNewColor()));
+                }
             }
         }
+
+//            val msg = s.substring(4);
+//            val split = msg.split(",");
+//            for(var x: split){
+//                if(x.equals("?1")){
+//                    builder.append(xCord).append(",");
+//                } else if (x.equals("?2")){
+//                    builder.append(yCord).append(",");
+//                } else{
+//                    builder.append(x).append(",");
+//                }
+//            }
+//            snakeConstructs.put(webSocket, builder.substring(0, builder.length()-1));
+//            System.out.println(builder.substring(0, builder.length()));
+
+        if (clients.size() == lobbySize) {        // LOBBY SIZE
+            for (var msg : snakeConstructs2) {
+                for (var x : clients) {
+                    writeMsg(x.getId(), msg);
+                }
+            }
+        }
+    }
+
+}
 
 //        else if (type.startsWith("pickup")) ;
 //        else if (type.startsWith("wall")) ;
@@ -222,5 +259,4 @@ public class ServerSocket extends WebSocketServer {
 //
 //            }
 //        }
-    }
-}
+

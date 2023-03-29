@@ -17,8 +17,8 @@ public class SnakeMove extends Message{
 
     @Override
     public String toString() {
-        return "SnakeMove[" +
+        return "SnakeMove{" +
                 "isLeft=" + isLeft +
-                ']';
+                '}';
     }
 }

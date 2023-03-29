@@ -25,4 +25,12 @@ public class SnakeCollision extends Message{
     public void setPickupId(int pickupId) {
         this.pickupId = pickupId;
     }
+
+    @Override
+    public String toString() {
+        return "SnakeCollision{" +
+                "isPickup=" + isPickup +
+                ", pickupId=" + pickupId +
+                '}';
+    }
 }

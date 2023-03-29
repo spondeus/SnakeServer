@@ -46,5 +46,15 @@ public class SnakeConstruct extends Message {
     public void setColor(Color color) {
         this.color = color;
     }
+
+    @Override
+    public String toString() {
+        return "SnakeConstruct{" +
+                "x=" + x +
+                ", y=" + y +
+                ", radius=" + radius +
+                ", color=" + color +
+                '}';
+    }
 }
 

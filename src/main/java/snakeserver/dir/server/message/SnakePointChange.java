@@ -15,5 +15,12 @@ public class SnakePointChange extends Message{
     public void setChange(int change) {
         this.change = change;
     }
+
+    @Override
+    public String toString() {
+        return "SnakePointChange{" +
+                "change=" + change +
+                '}';
+    }
 }
 
