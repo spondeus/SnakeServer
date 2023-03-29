@@ -1,29 +1,28 @@
 package snakeserver.dir.controller;
 
-import jakarta.validation.ConstraintViolation;
-import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import snakeserver.dir.authetication.PlayerService;
+import snakeserver.dir.emailsender.EmailSender;
+import snakeserver.dir.emailsender.EmailTemplateBuilder;
 import snakeserver.dir.model.Player;
 import snakeserver.dir.model.PlayerRepository;
 
-import java.security.Principal;
 
 @Controller
 public class PlayerController {
 
     private PlayerService playerService;
     private final PlayerRepository playerRepository;
+
+    @Autowired
+    private EmailSender sender;
 
     public PlayerController(
             PlayerService pService,
@@ -50,6 +49,7 @@ public class PlayerController {
             @ModelAttribute("newuser")
             @Validated
             RegistrationForm registrationForm,
+            EmailTemplateBuilder template,
             BindingResult bind,
             Model model
     ) {
@@ -66,7 +66,9 @@ public class PlayerController {
 
         try {
             playerRepository.save(player);
-            return "redirect:/home";
+            template.setName(player.getName());
+            sender.send(player.getEmail(), template.build());
+            return "redirect:/login/false";
         } catch (DataAccessException e) {
             if (e.getMessage().contains("snake_player.name")) model.addAttribute("nameError", e.getMessage());
             if (e.getMessage().contains("snake_player.email")) model.addAttribute("emailError", e.getMessage());
@@ -79,8 +81,27 @@ public class PlayerController {
     public String loginPage() {
         return "login";
     }
+
+    @GetMapping(path={"/login/{active}"})
+    public String loginPageActiv(
+            @PathVariable (value="active") boolean active,
+            Model model
+    ) {
+        model.addAttribute("active", active);
+        return "login";
+    }
     @GetMapping(path={"/logout"})
     public String logoutPage() {
         return "redirect:/home";
     }
+
+
+    @GetMapping(path = "/login/activation/{name}")
+    public String activationRegistration(
+            @PathVariable(value="name") String name
+    ){
+        playerRepository.updateEnableByName(name);
+        return "redirect:/login/true";
+    }
+
 }
