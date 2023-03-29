@@ -28,14 +28,14 @@
             data-th-if="${#fields.hasErrors('name')}"
             data-th-errors="*{name}"
     ></p>
-    <p th:if="${nameError}" class="error" style="color: red;" >Ez a Player Name már létezik!</p>
+    <p th:if="${nameError}" class="error" style="color: red;" >This Player Name already exists!</p>
 
     <p
             style="color: red;"
             data-th-if="${#fields.hasErrors('email')}"
             data-th-errors="*{email}"
     ></p>
-    <p th:if="${emailError}" class="error"  style="color: red;">Ez az e-mail cím már létezik!</p>
+    <p th:if="${emailError}" class="error"  style="color: red;">This email address already exists!</p>
 
     <p
             style="color: red;"

@@ -11,14 +11,14 @@ import lombok.Setter;
 @Setter
 public class RegistrationForm {
 
-    @Size(min = 6, max = 20, message = "A Player Name méretnek 6 és 20 karakter között kell lennie!")
+    @Size(min = 6, max = 20, message = "The Player Name must be between 6 and 20 characters!")
     private String name;
 
     @Pattern(regexp = "^(?=.*?[a-z])+(?=.*?[A-Z])+(?=.*?[0-9]){2,}.{6,30}$",
-            message = "A jelszó minimum 6 karakter, tartalmaznia kell 1 kisbetűt, 1 nagybetűt és 2 számot!")
+            message = "The password is at least 6 characters long, must contain 1 lowercase letter, 1 uppercase letter and 2 numbers!")
     private String password;
 
     @Email
-    @NotEmpty(message = "E-mail címet kötelezző megadni!")
+    @NotEmpty(message = "An e-mail address is required!")
     private String email;
 }

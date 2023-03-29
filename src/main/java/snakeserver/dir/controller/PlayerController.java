@@ -68,7 +68,7 @@ public class PlayerController {
             playerRepository.save(player);
             template.setName(player.getName());
             sender.send(player.getEmail(), template.build());
-            return "redirect:/login/false";
+            return "redirect:/login/inactiv";
         } catch (DataAccessException e) {
             if (e.getMessage().contains("snake_player.name")) model.addAttribute("nameError", e.getMessage());
             if (e.getMessage().contains("snake_player.email")) model.addAttribute("emailError", e.getMessage());
@@ -84,7 +84,7 @@ public class PlayerController {
 
     @GetMapping(path={"/login/{active}"})
     public String loginPageActiv(
-            @PathVariable (value="active") boolean active,
+            @PathVariable (value="active") String active,
             Model model
     ) {
         model.addAttribute("active", active);
@@ -101,7 +101,17 @@ public class PlayerController {
             @PathVariable(value="name") String name
     ){
         playerRepository.updateEnableByName(name);
-        return "redirect:/login/true";
+        return "redirect:/login/activ";
     }
+
+//    @GetMapping(path={"/newpassword/{name}"})
+//    public String newPassword(
+//            @PathVariable(value = "name") String name,
+//            Model model
+//    ) {
+//        model.addAttribute("newpassword", new RegistrationForm());
+//        model.addAttribute("name", name);
+//        return "newpassword";
+//    }
 
 }

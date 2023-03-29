@@ -8,11 +8,18 @@ import org.springframework.stereotype.Component;
 public class EmailTemplateBuilder {
 
     private String name = "Player";
-    private final String mailHtml = """
-            <span style="font-size:30px"><strong>Üdv %name%!</strong></span>
+    private final String activationMail = """
+            <span style="font-size:30px"><strong>Hello %name%!</strong></span>
             <br>
-            <p><strong>Kattints a követekező linkre a felhasználód aktiválásához:</strong></p>
+            <p><strong>Click on the following link to activate your user:</strong></p>
             <a href="http://localhost:8081/login/activation/%name%">Activation<a>
+            """;
+
+    private final String forgottenPasswordMail = """
+            <span style="font-size:30px"><strong>Hello %name%!</strong></span>
+            <br>
+            <p><strong>Click the following link to set a new password:</strong></p>
+            <a href="http://localhost:8081/newpassword/%name%">Activation<a>
             """;
 
     public void setName(String name) {
@@ -20,6 +27,9 @@ public class EmailTemplateBuilder {
     }
 
     public String build() {
-        return mailHtml.replace("%name%", this.name);
+        return activationMail.replace("%name%", this.name);
+    }
+    public String forgotPassword() {
+        return forgottenPasswordMail;
     }
 }

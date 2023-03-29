@@ -4,20 +4,21 @@
   <title>Login</title>
 </head>
 <body>
-<div th:if="${param.error}">
-  Invalid username and password.
+<div th:if="${param.error}" style="color: red">
+  The Player Name or Password is incorrect!
 </div>
-<div th:if="${param.logout}">
+<div th:if="${param.logout}" style="color: red">
   You have been logged out.
 </div>
 <form th:action="@{/login}" method="post">
-  <div><label> Player Name : <input type="text" name="name"/> </label></div>
+  <div><label> Player Name: <input type="text" name="name"/> </label></div>
   <div><label> Password: <input type="password" name="password"/> </label></div>
   <div><input type="submit" value="Sign In"/></div>
 </form>
+<div th:if = "(${active == 'active'})">You have activated your user, now you can log in!</div>
+<div th:if = "${active == 'inactive'}">Activate your user on the link received in the email sent during registration!</div>
 
 <a href="/home"><BUTTON>Home</BUTTON></a>
 
-<!--<p th:if="" </pth>-->
 </body>
 </html>
