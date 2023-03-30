@@ -2,33 +2,40 @@ package snakeserver.dir.server.message.pickups;
 
 import lombok.Getter;
 import lombok.Setter;
+import snakeserver.dir.server.message.Message;
 import snakeserver.dir.util.Vector2;
 
-public class Pickup {
-    @Getter @Setter
-    private final String msg = "pickup";
+public class Pickup extends Message {
     @Getter @Setter
     private Type type;
 
-    private int id;
+    private final int pickUpId;
 
     @Getter @Setter
     private Vector2 position;
 
-    public int getId(){
-        return id;
+    public int getPickUpId() {
+        return pickUpId;
     }
 
     public Pickup(Type type, int id, Vector2 position){
         this.type = type;
-        this.id = id;
+        this.pickUpId = id;
         this.position = position;
     }
 
+    /*
     @Override
     public String toString(){
         return String.format(
                 "%s#%s#%d#%d#%d",msg,type,id, (int) position.x(),(int) position.y()
         );
+    }
+
+     */
+
+    @Override
+    public String toString() {
+        return super.toString();
     }
 }

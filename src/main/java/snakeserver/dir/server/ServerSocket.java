@@ -36,11 +36,13 @@ public class ServerSocket extends WebSocketServer {
     private Set<Integer> ids = new HashSet<>();
 
     private Gson gson = new Gson();
-    private ServerPickup pickups;
-    private final int minPickup = 5;
 
-    public List<Pickup> getPickups() {
-        return pickups.getPickups();
+    private boolean started = false;
+
+    private ServerPickup pickupsClass;
+    private final int minPickup = 5;
+    public List<Pickup> pickups() {
+        return pickupsClass.getPickups();
     }
 
     public ServerSocket(InetSocket address) {
@@ -207,7 +209,18 @@ public class ServerSocket extends WebSocketServer {
 //            }
 //        }
 
+        if(!started && clients.size() == lobbySize){
+            pickupsClass.addPickup(10);
+            for(var p: pickups())
+                writeMsg(p.getPickUpId(), p);
 
+            for (var msg : snakeConstructs2) {
+                for (var x : clients) {
+                    writeMsg(x.getId(), msg);
+                }
+            }
+            started = true;
+        }
     }
 
     @Override
@@ -219,10 +232,12 @@ public class ServerSocket extends WebSocketServer {
     public void onStart() {
         System.out.println(
                 """
-                        ================================
-                                Server Started
-                        ================================
-                        """);
+                    
+                    ================================
+                            Server Started
+                    ================================
+                    
+                    """);
     }
 
 
@@ -232,6 +247,7 @@ public class ServerSocket extends WebSocketServer {
         String type;
         if (msgObj instanceof SnakeMove) type = "snakeMove";
         else if (msgObj instanceof SnakeConstruct) type = "snakeConstruct";
+        else if (msgObj instanceof Pickup) type = "pickup";
         else type = "id";
         jsonObject.add("type", new JsonPrimitive(type));
         String color = gson.toJson(Color.RED);
@@ -271,7 +287,12 @@ public class ServerSocket extends WebSocketServer {
                     snakeConstructs2.add(new SnakeConstruct(xCord, yCord, 20, snakeColorChange.getNewColor()));
                 }
             }
+        } else if(type.startsWith("pickup")) {
+            if(type.equals("pickupRemove")){
+                pickups().removeIf(p -> p.getPickUpId() == Integer.parseInt(s));
+            }
         }
+
 
 //            val msg = s.substring(4);
 //            val split = msg.split(",");
@@ -287,13 +308,6 @@ public class ServerSocket extends WebSocketServer {
 //            snakeConstructs.put(webSocket, builder.substring(0, builder.length()-1));
 //            System.out.println(builder.substring(0, builder.length()));
 
-        if (clients.size() == lobbySize) {        // LOBBY SIZE
-            for (var msg : snakeConstructs2) {
-                for (var x : clients) {
-                    writeMsg(x.getId(), msg);
-                }
-            }
-        }
     }
 
 }
