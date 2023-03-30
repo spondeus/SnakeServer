@@ -262,6 +262,7 @@ public class ServerSocket extends WebSocketServer {
         if (msgObj instanceof SnakeMove) type = "snakeMove";
         else if (msgObj instanceof SnakeConstruct) type = "snakeConstruct";
         else if (msgObj instanceof Pickup) type = "pickupConst";
+        else if(msgObj instanceof PickupRemove) type="pickupRemove";
         else type = "id";
         jsonObject.add("type", new JsonPrimitive(type));
         String color = gson.toJson(Color.RED);
