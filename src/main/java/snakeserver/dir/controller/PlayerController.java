@@ -32,7 +32,8 @@ public class PlayerController {
     }
 
     @GetMapping(path = {"/", "", "/home"})
-    public String homePage() {
+    public String homePage(Model m) {
+        m.addAttribute("newuser", new RegistrationForm());
         return "home";
     }
 
