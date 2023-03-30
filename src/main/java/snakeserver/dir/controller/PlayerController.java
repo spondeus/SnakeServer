@@ -83,10 +83,16 @@ public class PlayerController {
         return "login";
     }
 
-    @PostMapping(path = {"/login"})
-    public String loginPagePost() {
-        return "login";
+//    @PostMapping(path = {"/login"})
+//    public String loginPagePost() {
+//        return "game";
+//    }
+
+    @GetMapping(path = {"/game"})
+    public String gamePage() {
+        return "game";
     }
+
 
     @GetMapping(path = "/login/activation/{name}")
     public String activationRegistration(
@@ -97,7 +103,7 @@ public class PlayerController {
     }
 
     @GetMapping(path = {"/login/{status}"})
-    public String loginPageActiv(
+    public String loginPageActive(
             @PathVariable(value = "status") String status,
             Model model
     ) {
@@ -120,14 +126,24 @@ public class PlayerController {
     }
 
 
-//    @GetMapping(path={"/newpassword/{name}"})
-//    public String newPassword(
-//            @PathVariable(value = "name") String name,
-//            Model model
+    @GetMapping(path={"/login/forgotten-password"})
+    public String forgottenPassword(
+        Model model
+    ) {
+        model.addAttribute("email", new String());
+        return "forgotten-password";
+    }
+
+//    @PostMapping(path={"/login/forgotten-password/{email}"})
+//    public String forgottenPasswordPost(
+//            @ModelAttribute("email")
+//            @Validated
+//            Model model,
+//            EmailTemplateBuilder template
 //    ) {
-//        model.addAttribute("newpassword", new RegistrationForm());
-//        model.addAttribute("name", name);
-//        return "newpassword";
+//        model.addAttribute("email", email);
+//        sender.send(email, template.buildEmail());
+//        return "redirect:/login/forgotten-password";
 //    }
 
 }

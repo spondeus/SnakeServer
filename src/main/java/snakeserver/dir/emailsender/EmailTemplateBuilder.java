@@ -29,7 +29,5 @@ public class EmailTemplateBuilder {
     public String build() {
         return activationMail.replace("%name%", this.name);
     }
-    public String forgotPassword() {
-        return forgottenPasswordMail;
-    }
+    public String buildEmail() { return forgottenPasswordMail.replace("%name%", this.name);}
 }
