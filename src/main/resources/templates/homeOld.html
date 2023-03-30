@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+    <form th:action="@{/login}" method="get">
+        <input type="submit" value="Login"/>
+    </form>
+
+    <div>
+    <a href="/registration"><button>Registration</button></a>
+    </div>
+
+    <form th:action="@{/logout}" method="post">
+        <input type="submit" value="Logout"/>
+    </form>
+
+    <p th:if="${logoutText == 'logout'}"  color="red">You have been logged out.</p>
+</body>
+</html>
