@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import lombok.Getter;
 import lombok.val;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
@@ -15,6 +16,7 @@ import snakeserver.dir.server.message.SnakeColorChange;
 import snakeserver.dir.server.message.SnakeConstruct;
 import snakeserver.dir.server.message.SnakeMove;
 import snakeserver.dir.server.message.pickups.Pickup;
+import snakeserver.dir.server.message.pickups.PickupRemove;
 import snakeserver.dir.server.message.pickups.ServerPickup;
 
 import java.awt.*;
@@ -28,6 +30,7 @@ public class ServerSocket extends WebSocketServer {
 
     public static ServerSocket socket;
 
+    @Getter
     private final List<Client> clients = new ArrayList<>();
 
     private Map<WebSocket, String> snakeConstructs = new HashMap<>();
@@ -109,12 +112,16 @@ public class ServerSocket extends WebSocketServer {
             if (x == webSocket)
                 snakeConstructs.remove(x);
         }
+        if(clients.size() == 0){
+            started = false;
+            pickupsClass.reset();
+            snakeConstructs2.clear();
+        }
     }
 
     @Override
     public void onMessage(WebSocket webSocket, String s) {
-        System.out.println(webSocket.getRemoteSocketAddress() + ": " + s);
-        readMsg(s);
+        readMsg(s, webSocket);
 //        writeMsg(1,new SnakeConstruct(10,10,10, Color.BLUE));
 
 //        public void onMessage (WebSocket webSocket, String s){
@@ -210,17 +217,24 @@ public class ServerSocket extends WebSocketServer {
 //        }
 
         if(!started && clients.size() == lobbySize){
-            pickupsClass.addPickup(10);
-            for(var p: pickups())
-                writeMsg(p.getPickUpId(), p);
-
             for (var msg : snakeConstructs2) {
                 for (var x : clients) {
                     writeMsg(x.getId(), msg);
                 }
             }
-            started = true;
+
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.add("id", new JsonPrimitive(-1));
+            jsonObject.add("type", new JsonPrimitive("id"));
+            String msg = gson.toJson(jsonObject);
+            webSocket.send(msg);
+
+            pickupsClass = new ServerPickup(10);
+            for(var p: pickups())
+                writeMsg(p.getPickUpId(), p);
+
         }
+        started = true;
     }
 
     @Override
@@ -247,7 +261,7 @@ public class ServerSocket extends WebSocketServer {
         String type;
         if (msgObj instanceof SnakeMove) type = "snakeMove";
         else if (msgObj instanceof SnakeConstruct) type = "snakeConstruct";
-        else if (msgObj instanceof Pickup) type = "pickup";
+        else if (msgObj instanceof Pickup) type = "pickupConst";
         else type = "id";
         jsonObject.add("type", new JsonPrimitive(type));
         String color = gson.toJson(Color.RED);
@@ -260,17 +274,20 @@ public class ServerSocket extends WebSocketServer {
         System.out.println("sent:" + jsonObject);
     }
 
-    public void readMsg(String s) {
-        System.out.println(" got:" + s);
+    public void readMsg(String s, WebSocket webSocket) {
         JsonObject jsonObject = gson.fromJson(s, JsonObject.class);
         // process header
         JsonElement cId = jsonObject.get("id");
         int clientId = cId.getAsInt();
         JsonElement msgType = jsonObject.get("type");
         String type = msgType.getAsString();
+
+        if(!type.equals("snakeMove")){
+            System.out.println(webSocket.getRemoteSocketAddress() + ": " + s);
+        }
+
         if (type.equals("snakeMove")) {     // only forwarding
             for (var x : clients) {
-                System.out.println("sent:" + s);
                 x.getWebSocket().send(s);
             }
             return;
@@ -289,7 +306,17 @@ public class ServerSocket extends WebSocketServer {
             }
         } else if(type.startsWith("pickup")) {
             if(type.equals("pickupRemove")){
-                pickups().removeIf(p -> p.getPickUpId() == Integer.parseInt(s));
+                String data = jsonObject.get("data").getAsString();
+                PickupRemove pickupRemove = gson.fromJson(data, PickupRemove.class);
+                pickupsClass.removePickupById(pickupRemove.getPickupId());
+                if (pickups().size() < minPickup) {
+                    for (int i = 0; i < 10-pickups().size(); i++){
+                        val newPickup = pickupsClass.newPickup();
+                        writeMsg(0, newPickup);
+                        pickupsClass.addPickup(newPickup);
+                    }
+                }
+                writeMsg(clientId, pickupRemove);
             }
         }
 

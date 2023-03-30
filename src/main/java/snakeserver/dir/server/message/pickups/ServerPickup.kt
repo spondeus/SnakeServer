@@ -9,28 +9,33 @@ class ServerPickup(number: Int)
 	val ids = mutableSetOf<Int>()
 
 	fun removePickupById(id: Int){
+		ids.remove(id)
 		for(p in pickups)
 			if(p.id == id)
 				pickups.remove(p)
 	}
 
-	fun addPickup(num: Int){
-		for(p in 0 until num){
-			val random = Random().nextInt(1,6)
-			while(true){
-				val id = Random().nextInt(1,100)
-				if(!ids.contains(id)){
-					ids.add(id)
-					pickups.add(
-						Pickup(
-							intToType(random),
-							id,
-							Vector2(
-								Random().nextInt(100, 1100).toFloat(),
-								Random().nextInt(100, 700).toFloat(),
-							)))
-					break
-				}
+	fun reset(){
+		pickups.removeAll(pickups);
+	}
+
+	fun addPickup(pickup: Pickup){
+		pickups.add(pickup)
+	}
+
+	fun newPickup(): Pickup{
+		val random = Random().nextInt(1,6)
+		while(true){
+			val id = Random().nextInt(1,100)
+			if(!ids.contains(id)){
+				ids.add(id)
+				return Pickup(
+						intToType(random),
+						id,
+						Vector2(
+							Random().nextInt(100, 1100).toFloat(),
+							Random().nextInt(100, 700).toFloat(),
+						))
 			}
 		}
 	}
