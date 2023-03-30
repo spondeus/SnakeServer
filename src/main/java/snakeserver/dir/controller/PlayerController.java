@@ -69,7 +69,7 @@ public class PlayerController {
             playerRepository.save(player);
             template.setName(player.getName());
             sender.send(player.getEmail(), template.build());
-            return "redirect:/login/inactiv";
+            return "redirect:/login/inactive";
         } catch (DataAccessException e) {
             if (e.getMessage().contains("snake_player.name")) model.addAttribute("nameError", e.getMessage());
             if (e.getMessage().contains("snake_player.email")) model.addAttribute("emailError", e.getMessage());
@@ -88,12 +88,20 @@ public class PlayerController {
         return "login";
     }
 
-    @GetMapping(path = {"/login/{active}"})
+    @GetMapping(path = "/login/activation/{name}")
+    public String activationRegistration(
+            @PathVariable(value = "name") String name
+    ) {
+        playerRepository.updateEnableByName(name);
+        return "redirect:/login/active";
+    }
+
+    @GetMapping(path = {"/login/{status}"})
     public String loginPageActiv(
-            @PathVariable(value = "active") String active,
+            @PathVariable(value = "status") String status,
             Model model
     ) {
-        model.addAttribute("active", active);
+        model.addAttribute("status", status);
         return "login";
     }
 
@@ -111,14 +119,6 @@ public class PlayerController {
         return "redirect:/home";
     }
 
-
-    @GetMapping(path = "/login/activation/{name}")
-    public String activationRegistration(
-            @PathVariable(value = "name") String name
-    ) {
-        playerRepository.updateEnableByName(name);
-        return "redirect:/login/activ";
-    }
 
 //    @GetMapping(path={"/newpassword/{name}"})
 //    public String newPassword(
