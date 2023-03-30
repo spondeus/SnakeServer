@@ -11,16 +11,30 @@
       * a{
         user-select: none;
       }
+      body{
+        background-color: initial;
+      }
       #nav-links a{
         color: #d3d3d3;
       }
-      nav a{
-        margin-left: 10px;
+      #nav-links ion-icon{
+        margin: -0.1rem;
+        vertical-align: sub;
+        margin-left: 1.5rem;
+      }
+      nav strong{
         vertical-align: sub;
       }
-      .container{
-        max-height: max-content;
-        margin: 0 auto;
+      nav a{
+        margin-left: 1.5rem;
+        vertical-align: sub;
+      }
+      .about-list-icons{
+      }
+
+      #about span{
+        width: 120%;
+        display: inline-flex;
       }
       .login{
         display: none;
@@ -42,14 +56,14 @@
       }
       .login button{
         width: 50%;
+        margin-bottom: -1rem;
       }
       #play{
         width: 150%;
       }
-      .buttons{
+      .login-buttons{
         display: flex;
       }
-
       footer{
         position: fixed;
         bottom: 0;
@@ -60,32 +74,52 @@
 </head>
 
 <body>
-  
-  <header>
-    <nav class="container">
-      <ul>
-        <li><strong style="font-size: 1.5rem;">PentaSnake</strong></li>
-        <li><a id="play" th:if="${}" href="" role="button" class="contrast outline">Play</a></li>
-      </ul>
-      <ul id="nav-links">
-        <li><a href="#" onclick="showLogin()">Login</a></li>
-        <li><a href="">Register</a></li>
-        <li><a th:if="${}" href="">Logout</a></li>
-        <li><a href="">About</a></li>
-      </ul>
-    </nav>
-      
-  </header>
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+  <nav class="container">
+    <ul>
+      <li><strong style="font-size: 1.5rem;">PentaSnake</strong></li>
+      <li><a id="play" th:if="" th:href="#{}" href="" role="button" class="contrast outline">Play</a></li>
+    </ul>
+    <ul id="nav-links">
+      <li><a href="#" onclick="showLogin()">Login</a></li>
+      <li><a href="#" onclick="showRegister()">Register</a></li>
+      <li><a th:if="" href="">Logout</a></li>
+      <li role="list" dir="rtl" id="about">
+        <ion-icon name="list-outline"></ion-icon>
+        <ul role="listbox">
+          <li>
+            <span>
+              <ion-icon class="about-list-icons" name="logo-github"></ion-icon>
+              <a href="http://">Github (Client)</a>
+            </span>
+          </li>
+          <li>
+            <span>
+              <ion-icon class="about-list-icons" name="logo-github"></ion-icon>
+              <a href="http://">Github (Server)</a>
+            </span>
+          </li>
+          <li>
+            <span>
+              <ion-icon class="about-list-icons" name="people"></ion-icon>
+              <a href="#">Team</a>
+            </span>
+          </li>
+        </ul>
+    </ul>
+  </nav>
   
   <main class="container">
     <section class="login" id="login">
       <h3>Log in</h3>
-      <form action="@{/login}" method="post">
+      <form th:action="@{/login}" method="post">
         <label for="username"></label>
-        <input type="text" name="username" id="username" placeholder="Username" required>
+        <input type="text" name="username" id="username" placeholder="Username" aria-invalid="none" required >
         
         <label for="password"></label>
-        <input type="password" name="password" id="password" placeholder="Password" required>
+        <input type="password" name="password" id="password" placeholder="Password" aria-invalid="none" required>
         
         <div class="login-buttons">
           <button type="submit" value="Login" role="button" class="contrast outline">Login</button>
@@ -93,35 +127,61 @@
         </div>
       </form>
     </section>
+
+    <section class="login" id="register">
+        <h3>Register</h3>
+        <form th:action="@{/register}" method="post">
+          <label for="usernameReg"></label>
+          <input type="text" name="username" id="usernameReg" placeholder="Username" aria-invalid="none" required>
+
+          <label for="emailReg"></label>
+          <input type="email" name="email" id="emailReg" placeholder="Email" aria-invalid="none" required>
+
+          <label for="passwordReg"></label>
+          <input type="password" name="password" id="passwordReg" placeholder="Password" aria-invalid="none" required>
+
+          <div class="login-buttons">
+            <label for="passwordConf"></label>
+            <input type="password" name="passwordConf" id="passwordConf" placeholder="Confirm Password" aria-invalid="none" required>
+          </div>
+
+          <button type="submit" role="button" value="Register" class="contrast outline">Register</button>
+        </form>
+    </section>
   </main>
 
   <footer class="container">
     <label for="switch" class=""></label>
-    <input onclick="switchTheme()" id="switch" type="checkbox" name="switch" role="switch">Light
+    <input onclick="switchTheme()" id="switch" type="checkbox" name="switch" role="switch" checked>Dark
   </footer>
 
   <script>
     var body = document.getElementById("main")
     var login = document.getElementById("login")
     var navLinks = document.getElementById("nav-links")
-    
+    var register = document.getElementById("register")
+
     function switchTheme() {
       var dataTheme = body.getAttribute("data-theme")
       if(dataTheme === "dark"){
         body.setAttribute("data-theme", "light")
         login.style.outlineColor = "black"
+        register.style.outlineColor = "black"
         //nav link color
         navLinks.querySelectorAll("a").forEach(function(link){
           link.style.color = "black"
         })
+        body.style.backgroundColor = "darkgrey"
       }
       if(dataTheme === "light"){
         body.setAttribute("data-theme", "dark")
         login.style.outlineColor = "#0c96bf"
+        register.style.outlineColor = "#0c96bf"
         //nav link color
         navLinks.querySelectorAll("a").forEach(function(link){
           link.style.color = "#d3d3d3"
         })
+        body.style.backgroundColor = ""
       }
     }
     
@@ -130,26 +190,54 @@
       details.removeAttribute("open");
     }
 
+    function showRegister() {
+      if(login.style.display === "grid"){
+        gridFadeInOut(login)
+      }
+      setTimeout(() => {
+        gridFadeInOut(register)
+      }, 300);
+    }
+
     function showLogin() {
-      if(login.style.display == "grid"){
-        login.style.transition = "opacity 0.5s ease-in-out";
-        login.style.opacity = "0";
+      if(register.style.display === "grid"){
+        gridFadeInOut(register)
+      }
+      setTimeout(() => {
+        gridFadeInOut(login)
+      }, 300);
+    }
+
+    function closeForm(form) {
+      if(!form instanceof HTMLElement){
+        return
+      }
+      form.style.display = "none"
+    }
+
+
+    function gridFadeInOut(form){
+      if(!form instanceof HTMLElement){
+        return
+      }
+      if(form.style.display === "grid"){
+        form.style.transition = "opacity 0.5s ease-in-out";
+        form.style.opacity = "0";
         setTimeout(() => {
-          login.style.display = "none";
-          login.style.opacity = "1";
-          login.style.transition = "";
-        }, 500);
+          form.style.display = "none";
+          form.style.opacity = "1";
+          form.style.transition = "";
+        }, 300);
       } else {
-        login.style.transition = "opacity 0.5s ease-in-out";
-        login.style.opacity = "0";
-        login.style.display = "grid";
+        form.style.transition = "opacity 0.5s ease-in-out";
+        form.style.opacity = "0";
+        form.style.display = "grid";
         setTimeout(() => {
-          login.style.opacity = "1";
-        }, 500);
+          form.style.opacity = "1";
+        }, 300);
       }
     }
   </script>
 
 </body>
-
 </html>

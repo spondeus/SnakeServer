@@ -18,11 +18,5 @@ public class Client{
     private InetSocketAddress remoteAddress;
     private int id;
 
-    private boolean goLeft;
-    private boolean goRight;
-
-    private Vector2 position;
-    private int size;
-
     private WebSocket webSocket;
 }

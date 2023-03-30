@@ -1,9 +1,5 @@
 package snakeserver.dir.server;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import lombok.val;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
@@ -14,6 +10,8 @@ import com.badlogic.gdx.graphics.Color;
 import snakeserver.dir.server.message.SnakeColorChange;
 import snakeserver.dir.server.message.SnakeConstruct;
 import snakeserver.dir.server.message.SnakeMove;
+import snakeserver.dir.server.message.pickups.Pickup;
+import snakeserver.dir.server.message.pickups.ServerPickup;
 
 import java.awt.*;
 import java.util.*;
@@ -36,6 +34,15 @@ public class ServerSocket extends WebSocketServer {
     private Gson gson = new Gson();
 
     public ServerSocket(InetSocket address) {
+    private ServerPickup pickups;
+    public List<Pickup> getPickups(){
+        return pickups.getPickups();
+    }
+
+    private final int minPickup = 5;
+
+
+    public ServerSocket(InetSocket address){
         super(address);
         this.start();
         //this.run();
@@ -43,8 +50,8 @@ public class ServerSocket extends WebSocketServer {
     }
 
     @Override
-    public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
-        if (clients.size() >= 5) {
+    public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake){
+        if(clients.size() >= lobbySize){
             webSocket.closeConnection(0, "server full");
             return;
         }
@@ -106,6 +113,29 @@ public class ServerSocket extends WebSocketServer {
         System.out.println(webSocket.getRemoteSocketAddress() + ": " + s);
         readMsg(s);
 //        writeMsg(1,new SnakeConstruct(10,10,10, Color.BLUE));
+    public void onMessage(WebSocket webSocket, String s){
+
+        if(s.startsWith("pickup")){
+            val msg = s.substring(6);
+            val split = msg.split(",");
+
+            pickups.removePickupById(Integer.parseInt(split[1]));
+            for(var x: clients)
+                x.getWebSocket().send("pickupRem#"+split[1]);
+
+            if(getPickups().size() < 5){
+                pickups.addPickup(10-getPickups().size());
+            }
+            for(var p: getPickups()){
+                for(var c: clients){
+                    c.getWebSocket().send(p.toString());
+                }
+            }
+        }
+
+        if(!s.startsWith("input"))
+            System.out.println(webSocket.getRemoteSocketAddress() + ": " + s);
+        val builder = new StringBuilder();
 
 
 //        val builder = new StringBuilder();
@@ -154,6 +184,26 @@ public class ServerSocket extends WebSocketServer {
 //                x.getWebSocket().send(string.toString());
 //            }
 //        }
+        if(clients.size() == lobbySize){        // LOBBY SIZE
+            pickups = new ServerPickup(10);
+            System.out.println("pickups " + getPickups());
+
+            for(var c: clients){
+                for(var p: getPickups()){
+                    c.getWebSocket().send(p.toString());
+                }
+            }
+
+            val string = new StringBuilder();
+            string.append("cons#");
+
+            for(var x: snakeConstructs.values()){
+                string.append(x).append("#");
+            }
+            for(var x: clients){
+                x.getWebSocket().send(string.toString());
+            }
+        }
 
     }
 
