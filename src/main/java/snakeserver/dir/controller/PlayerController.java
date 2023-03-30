@@ -6,6 +6,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import snakeserver.dir.authetication.PlayerService;
@@ -31,12 +32,12 @@ public class PlayerController {
         this.playerRepository = pRepository;
     }
 
-    @GetMapping(path={"/", "", "/home"})
+    @GetMapping(path = {"/", "", "/home"})
     public String homePage() {
         return "home";
     }
 
-    @GetMapping(path={"/registration"})
+    @GetMapping(path = {"/registration"})
     public String registrationPage(
             Model m
     ) {
@@ -44,13 +45,13 @@ public class PlayerController {
         return "registration-form";
     }
 
-    @PostMapping(path={"/registration"})
+    @PostMapping(path = {"/registration"})
     public String saveRegistration(
             @ModelAttribute("newuser")
             @Validated
             RegistrationForm registrationForm,
-            EmailTemplateBuilder template,
             BindingResult bind,
+            EmailTemplateBuilder template,
             Model model
     ) {
         if (bind.hasErrors()) {
@@ -74,32 +75,47 @@ public class PlayerController {
             if (e.getMessage().contains("snake_player.email")) model.addAttribute("emailError", e.getMessage());
             return "registration-form";
         }
-        }
+    }
 
 
-    @GetMapping(path={"/login"})
+    @GetMapping(path = {"/login"})
     public String loginPage() {
         return "login";
     }
 
-    @GetMapping(path={"/login/{active}"})
+    @PostMapping(path = {"/login"})
+    public String loginPagePost() {
+        return "login";
+    }
+
+    @GetMapping(path = {"/login/{active}"})
     public String loginPageActiv(
-            @PathVariable (value="active") String active,
+            @PathVariable(value = "active") String active,
             Model model
     ) {
         model.addAttribute("active", active);
         return "login";
     }
-    @GetMapping(path={"/logout"})
+
+    @PostMapping(path = {"/logout"})
     public String logoutPage() {
+        return "redirect:/home/logout";
+    }
+
+    @GetMapping(path = {"/home/{logout}"})
+    public String homeLogoutPage(
+            @PathVariable(value = "logout") String logoutText,
+            Model model
+    ) {
+        model.addAttribute("logoutText", logoutText);
         return "redirect:/home";
     }
 
 
     @GetMapping(path = "/login/activation/{name}")
     public String activationRegistration(
-            @PathVariable(value="name") String name
-    ){
+            @PathVariable(value = "name") String name
+    ) {
         playerRepository.updateEnableByName(name);
         return "redirect:/login/activ";
     }

@@ -29,7 +29,8 @@ public class SecurityConfig {
                         .loginPage("/login")
                         .permitAll()
                 )
-                .logout(LogoutConfigurer::permitAll);
+                .logout()
+                .logoutSuccessUrl("/home/logout");
 
         return http.build();
     }
