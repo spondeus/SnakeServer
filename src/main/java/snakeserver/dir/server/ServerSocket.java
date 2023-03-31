@@ -26,14 +26,13 @@ import java.util.List;
 @Component
 public class ServerSocket extends WebSocketServer {
 
-    public int lobbySize = 1;   // LOBBY SIZE
+    public int lobbySize = 2;   // LOBBY SIZE
 
     public static ServerSocket socket;
 
     @Getter
     private final List<Client> clients = new ArrayList<>();
 
-    private Map<WebSocket, String> snakeConstructs = new HashMap<>();
     private Queue<SnakeConstruct> snakeConstructs2 = new ArrayDeque<>();
 
     private Set<Integer> ids = new HashSet<>();
@@ -42,7 +41,7 @@ public class ServerSocket extends WebSocketServer {
 
     private boolean started = false;
 
-    private ServerPickup pickupsClass;
+    private ServerPickup pickupsClass = new ServerPickup();
     private final int minPickup = 5;
     public List<Pickup> pickups() {
         return pickupsClass.getPickups();
@@ -108,10 +107,6 @@ public class ServerSocket extends WebSocketServer {
 
         System.out.println("Client disconnected: " + clientAddress);
 
-        for (var x : snakeConstructs.keySet()) {
-            if (x == webSocket)
-                snakeConstructs.remove(x);
-        }
         if(clients.size() == 0){
             started = false;
             pickupsClass.reset();
@@ -217,24 +212,39 @@ public class ServerSocket extends WebSocketServer {
 //        }
 
         if(!started && clients.size() == lobbySize){
-            for (var msg : snakeConstructs2) {
-                for (var x : clients) {
-                    writeMsg(x.getId(), msg);
+            if(snakeConstructs2.size() == lobbySize){
+                for (var msg : snakeConstructs2) {
+                    for (var x : clients) {     // CONSTRUCT BROADCAST
+
+                        JsonObject jsonObject = new JsonObject();
+                        jsonObject.add("id", new JsonPrimitive(x.getId()));
+                        String type = "snakeConstruct";
+                        jsonObject.add("type", new JsonPrimitive(type));
+                        String color = gson.toJson(Color.RED);
+                        String innerJson = gson.toJson(msg);
+                        jsonObject.add("data", new JsonPrimitive(innerJson));
+                        String send = gson.toJson(jsonObject);
+
+                        x.getWebSocket().send(send);
+                    }
                 }
+
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.add("id", new JsonPrimitive(-1));
+                jsonObject.add("type", new JsonPrimitive("id"));
+                String msg = gson.toJson(jsonObject);
+                for(var c: clients){
+                    c.getWebSocket().send(msg);
+                }
+
+
+                pickupsClass = new ServerPickup(10);
+                for(var p: pickups())
+                    writeMsg(p.getPickUpId(), p);
+
+                started = true;
             }
-
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.add("id", new JsonPrimitive(-1));
-            jsonObject.add("type", new JsonPrimitive("id"));
-            String msg = gson.toJson(jsonObject);
-            webSocket.send(msg);
-
-            pickupsClass = new ServerPickup(10);
-            for(var p: pickups())
-                writeMsg(p.getPickUpId(), p);
-
         }
-        started = true;
     }
 
     @Override

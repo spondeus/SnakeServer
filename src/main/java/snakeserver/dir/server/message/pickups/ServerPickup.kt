@@ -3,7 +3,7 @@ package snakeserver.dir.server.message.pickups
 import snakeserver.dir.util.Vector2
 import java.util.Random
 
-class ServerPickup(number: Int)
+class ServerPickup()
 {
 	val pickups= mutableListOf<Pickup>()
 	val ids = mutableSetOf<Int>()
@@ -52,7 +52,7 @@ class ServerPickup(number: Int)
 		}
 	}
 
-	init
+	constructor(number: Int) : this()
 	{
 		for (i in 0 until number){
 			val random = Random().nextInt(1,6)
