@@ -36,15 +36,6 @@ public class PlayerController {
         m.addAttribute("newuser", new RegistrationForm());
         return "home";
     }
-
-    @GetMapping(path = {"/registration"})
-    public String registrationPage(
-            Model m
-    ) {
-        m.addAttribute("newuser", new RegistrationForm());
-        return "registration-form";
-    }
-
     @PostMapping(path = {"/registration"})
     public String saveRegistration(
             @ModelAttribute("newuser")
@@ -76,6 +67,24 @@ public class PlayerController {
             return "registration-form";
         }
     }
+    @PostMapping(path = {"/login"})
+    public String loginPagePost() {
+        return "login";
+    }
+    @PostMapping(path = {"/logout"})
+    public String logoutPage() {
+        return "redirect:/home/logout";
+    }
+
+    /*
+    @GetMapping(path = {"/registration"})
+    public String registrationPage(
+            Model m
+    ) {
+        m.addAttribute("newuser", new RegistrationForm());
+        return "registration-form";
+    }
+
 
 
     @GetMapping(path = {"/login"})
@@ -83,10 +92,6 @@ public class PlayerController {
         return "login";
     }
 
-    @PostMapping(path = {"/login"})
-    public String loginPagePost() {
-        return "login";
-    }
 
     @GetMapping(path = "/login/activation/{name}")
     public String activationRegistration(
@@ -105,10 +110,6 @@ public class PlayerController {
         return "login";
     }
 
-    @PostMapping(path = {"/logout"})
-    public String logoutPage() {
-        return "redirect:/home/logout";
-    }
 
     @GetMapping(path = {"/home/{logout}"})
     public String homeLogoutPage(
@@ -129,5 +130,7 @@ public class PlayerController {
 //        model.addAttribute("name", name);
 //        return "newpassword";
 //    }
+
+     */
 
 }

@@ -19,7 +19,6 @@ import snakeserver.dir.server.message.pickups.Pickup;
 import snakeserver.dir.server.message.pickups.PickupRemove;
 import snakeserver.dir.server.message.pickups.ServerPickup;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
