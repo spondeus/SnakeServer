@@ -2,24 +2,24 @@ package snakeserver.dir.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import snakeserver.dir.authetication.PlayerService;
 import snakeserver.dir.emailsender.EmailSender;
-import snakeserver.dir.emailsender.EmailTemplateBuilder;
 import snakeserver.dir.model.Player;
 import snakeserver.dir.model.PlayerRepository;
+
 
 
 @Controller
 public class PlayerController {
 
-    private PlayerService playerService;
+    private final PlayerService playerService;
+    private final PasswordEncoder passwordEncoder;
     private final PlayerRepository playerRepository;
 
     @Autowired
@@ -27,9 +27,12 @@ public class PlayerController {
 
     public PlayerController(
             PlayerService pService,
-            PlayerRepository pRepository) {
+            PlayerRepository pRepository,
+            PasswordEncoder passwordEncoder
+    ) {
         this.playerService = pService;
         this.playerRepository = pRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping(path = {"/", "", "/home"})
@@ -51,7 +54,6 @@ public class PlayerController {
             @Validated
             RegistrationForm registrationForm,
             BindingResult bind,
-            EmailTemplateBuilder template,
             Model model
     ) {
         if (bind.hasErrors()) {
@@ -62,14 +64,11 @@ public class PlayerController {
         Player player = new Player();
         player.setName(registrationForm.getName());
         player.setEmail(registrationForm.getEmail());
-        player.setPassword(BCrypt.hashpw(registrationForm.getPassword(), BCrypt.gensalt()));
-
+        player.setPassword(passwordEncoder.encode(registrationForm.getPassword()));
 
         try {
             playerRepository.save(player);
-            template.setName(player.getName());
-            sender.send(player.getEmail(), template.build());
-            return "redirect:/login/inactive";
+            return "redirect:/login";
         } catch (DataAccessException e) {
             if (e.getMessage().contains("snake_player.name")) model.addAttribute("nameError", e.getMessage());
             if (e.getMessage().contains("snake_player.email")) model.addAttribute("emailError", e.getMessage());
@@ -83,11 +82,6 @@ public class PlayerController {
         return "login";
     }
 
-//    @PostMapping(path = {"/login"})
-//    public String loginPagePost() {
-//        return "game";
-//    }
-
     @GetMapping(path = {"/game"})
     public String gamePage() {
         return "game";
@@ -95,19 +89,11 @@ public class PlayerController {
 
 
 
-    @PostMapping(path = {"/logout"})
+    @GetMapping(path={"/logout"})
     public String logoutPage() {
-        return "redirect:/home/logout";
-    }
-
-    @GetMapping(path = {"/home/{logout}"})
-    public String homeLogoutPage(
-            @PathVariable(value = "logout") String logoutText,
-            Model model
-    ) {
-        model.addAttribute("logoutText", logoutText);
         return "redirect:/home";
     }
+
 
 
 }
