@@ -94,22 +94,6 @@ public class PlayerController {
     }
 
 
-    @GetMapping(path = "/login/activation/{name}")
-    public String activationRegistration(
-            @PathVariable(value = "name") String name
-    ) {
-        playerRepository.updateEnableByName(name);
-        return "redirect:/login/active";
-    }
-
-    @GetMapping(path = {"/login/{status}"})
-    public String loginPageActive(
-            @PathVariable(value = "status") String status,
-            Model model
-    ) {
-        model.addAttribute("status", status);
-        return "login";
-    }
 
     @PostMapping(path = {"/logout"})
     public String logoutPage() {

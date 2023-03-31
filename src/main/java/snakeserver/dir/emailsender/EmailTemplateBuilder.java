@@ -11,8 +11,7 @@ public class EmailTemplateBuilder {
     private final String activationMail = """
             <span style="font-size:30px"><strong>Hello %name%!</strong></span>
             <br>
-            <p><strong>Click on the following link to activate your user:</strong></p>
-            <a href="http://localhost:8081/login/activation/%name%">Activation<a>
+            <p><strong>Congratulations on registering to play PentaSnake! You can enter now. Let the game begin!</strong></p>
             """;
 
     public void setName(String name) {
