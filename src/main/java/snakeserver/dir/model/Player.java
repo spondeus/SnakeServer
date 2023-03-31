@@ -15,7 +15,7 @@ import java.util.List;
 
 @Setter
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(force = true)
 @Entity
 @Table(name = "snake_player")
 public class Player implements UserDetails {
@@ -35,7 +35,7 @@ public class Player implements UserDetails {
     @Column(unique = true)
     private String email;
 
-    private boolean enable = false;
+    private boolean enable = true;
 
     @OneToMany(mappedBy = "player")
     private List<Score> scores;
@@ -54,26 +54,26 @@ public class Player implements UserDetails {
 
     @Override
     public String getUsername() {
-        return null;
+        return this.getName();
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 }

@@ -11,15 +11,7 @@ public class EmailTemplateBuilder {
     private final String activationMail = """
             <span style="font-size:30px"><strong>Hello %name%!</strong></span>
             <br>
-            <p><strong>Click on the following link to activate your user:</strong></p>
-            <a href="http://localhost:8081/login/activation/%name%">Activation<a>
-            """;
-
-    private final String forgottenPasswordMail = """
-            <span style="font-size:30px"><strong>Hello %name%!</strong></span>
-            <br>
-            <p><strong>Click the following link to set a new password:</strong></p>
-            <a href="http://localhost:8081/newpassword/%name%">Activation<a>
+            <p><strong>Congratulations on registering to play PentaSnake! You can enter now. Let the game begin!</strong></p>
             """;
 
     public void setName(String name) {
@@ -28,8 +20,5 @@ public class EmailTemplateBuilder {
 
     public String build() {
         return activationMail.replace("%name%", this.name);
-    }
-    public String forgotPassword() {
-        return forgottenPasswordMail;
     }
 }
