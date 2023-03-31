@@ -310,8 +310,8 @@ public class ServerSocket extends WebSocketServer {
                 String data = jsonObject.get("data").getAsString();
                 SnakeColorChange snakeColorChange = gson.fromJson(data, SnakeColorChange.class);
                 if (snakeColorChange.getFirst() == -1) { // starter color
-                    val xCord = new Random().nextInt(100, 500);
-                    val yCord = new Random().nextInt(100, 500);
+                    val xCord = new Random().nextInt(100, 800);
+                    val yCord = new Random().nextInt(100, 800);
                     snakeConstructs2.add(new SnakeConstruct(xCord, yCord, 20, snakeColorChange.getNewColor()));
                 }
             }
