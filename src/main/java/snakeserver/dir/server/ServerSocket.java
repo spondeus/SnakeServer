@@ -230,6 +230,7 @@ public class ServerSocket extends WebSocketServer {
                         String send = gson.toJson(jsonObject);
 
                         x.getWebSocket().send(send);
+                        System.out.println("sent:" + send);
                     }
                 }
 
@@ -239,6 +240,7 @@ public class ServerSocket extends WebSocketServer {
                 String msg = gson.toJson(jsonObject);
                 for(var c: clients){
                     c.getWebSocket().send(msg);
+
                 }
 
 
@@ -313,9 +315,15 @@ public class ServerSocket extends WebSocketServer {
             if (type.equals("snakeColorChange")) {
                 String data = jsonObject.get("data").getAsString();
                 SnakeColorChange snakeColorChange = gson.fromJson(data, SnakeColorChange.class);
+                int xCord,yCord;
                 if (snakeColorChange.getFirst() == -1) { // starter color
-                    val xCord = new Random().nextInt(100, 800);
-                    val yCord = new Random().nextInt(100, 800);
+                    switch(clientId){  // 1200*800
+                        case 0: xCord=yCord=25;break;
+                        case 1: xCord=25;yCord=755;break;
+                        case 2: xCord= 25;yCord=725;break;
+                        case 3: xCord= 1175;yCord=25;break;
+                        default:xCord=25;yCord=400;break;
+                    }
                     snakeConstructs2.add(new SnakeConstruct(xCord, yCord, 20, snakeColorChange.getNewColor()));
                 }
             }
