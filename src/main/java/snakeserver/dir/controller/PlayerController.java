@@ -22,8 +22,6 @@ public class PlayerController {
     private final PasswordEncoder passwordEncoder;
     private final PlayerRepository playerRepository;
 
-    @Autowired
-    private EmailSender sender;
 
     public PlayerController(
             PlayerService pService,
