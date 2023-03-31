@@ -329,8 +329,10 @@ public class ServerSocket extends WebSocketServer {
             }
         } else if(type.startsWith("pickup")) {
             if(type.equals("pickupRemove")){
+                int id=jsonObject.getAsJsonPrimitive("id").getAsInt();
                 String data = jsonObject.get("data").getAsString();
                 PickupRemove pickupRemove = gson.fromJson(data, PickupRemove.class);
+
                 pickupsClass.removePickupById(pickupRemove.getPickupId());
                 if (pickups().size() < minPickup) {
                     for (int i = 0; i < 10-pickups().size(); i++){
@@ -339,7 +341,7 @@ public class ServerSocket extends WebSocketServer {
                         pickupsClass.addPickup(newPickup);
                     }
                 }
-                writeMsg(clientId, pickupRemove);
+                writeMsg(id, pickupRemove);
             }
         }
 
