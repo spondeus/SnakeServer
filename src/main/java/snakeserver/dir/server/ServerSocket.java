@@ -9,6 +9,8 @@ import lombok.val;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import snakeserver.dir.server.message.Message;
 import com.badlogic.gdx.graphics.Color;
@@ -43,6 +45,7 @@ public class ServerSocket extends WebSocketServer {
 
     private ServerPickup pickupsClass = new ServerPickup();
     private final int minPickup = 5;
+
     public List<Pickup> pickups() {
         return pickupsClass.getPickups();
     }
@@ -87,8 +90,9 @@ public class ServerSocket extends WebSocketServer {
         clients.add(newClient);
 
         for (var x : clients) {
-            if (webSocket != x.getWebSocket())
+            if (webSocket != x.getWebSocket()) {
                 x.getWebSocket().send("new player joined");
+            }
         }
 
         webSocket.send("you're the: " + clients.size() + ". player in the lobby");
@@ -332,6 +336,7 @@ public class ServerSocket extends WebSocketServer {
         }
 
 
+
 //            val msg = s.substring(4);
 //            val split = msg.split(",");
 //            for(var x: split){
@@ -347,7 +352,6 @@ public class ServerSocket extends WebSocketServer {
 //            System.out.println(builder.substring(0, builder.length()));
 
     }
-
 }
 
 //        else if (type.startsWith("pickup")) ;
