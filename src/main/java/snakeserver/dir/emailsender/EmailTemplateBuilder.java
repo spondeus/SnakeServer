@@ -15,13 +15,6 @@ public class EmailTemplateBuilder {
             <a href="http://localhost:8081/login/activation/%name%">Activation<a>
             """;
 
-    private final String forgottenPasswordMail = """
-            <span style="font-size:30px"><strong>Hello %name%!</strong></span>
-            <br>
-            <p><strong>Click the following link to set a new password:</strong></p>
-            <a href="http://localhost:8081/newpassword/%name%">Activation<a>
-            """;
-
     public void setName(String name) {
         this.name = name;
     }
@@ -29,5 +22,4 @@ public class EmailTemplateBuilder {
     public String build() {
         return activationMail.replace("%name%", this.name);
     }
-    public String buildEmail() { return forgottenPasswordMail.replace("%name%", this.name);}
 }

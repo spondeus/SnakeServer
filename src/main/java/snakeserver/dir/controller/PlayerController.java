@@ -126,24 +126,4 @@ public class PlayerController {
     }
 
 
-    @GetMapping(path={"/login/forgotten-password"})
-    public String forgottenPassword(
-        Model model
-    ) {
-        model.addAttribute("email", new String());
-        return "forgotten-password";
-    }
-
-//    @PostMapping(path={"/login/forgotten-password/{email}"})
-//    public String forgottenPasswordPost(
-//            @ModelAttribute("email")
-//            @Validated
-//            Model model,
-//            EmailTemplateBuilder template
-//    ) {
-//        model.addAttribute("email", email);
-//        sender.send(email, template.buildEmail());
-//        return "redirect:/login/forgotten-password";
-//    }
-
 }
