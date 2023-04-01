@@ -1,5 +1,6 @@
 package snakeserver.dir.server;
 
+import com.badlogic.gdx.utils.SnapshotArray;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -240,6 +241,11 @@ public class ServerSocket extends WebSocketServer {
 
                 }
 
+                WallMessage wallMessage=new WallMessage(Wall.spawnWalls());
+                for (var x:clients
+                     ) {
+                    writeMsg(x.getId(),wallMessage);
+                }
 
                 pickupsClass = new ServerPickup(10);
                 for (var p : pickups())
@@ -276,6 +282,7 @@ public class ServerSocket extends WebSocketServer {
         else if (msgObj instanceof SnakeConstruct) type = "snakeConstruct";
         else if (msgObj instanceof Pickup) type = "pickupConst";
         else if (msgObj instanceof PickupRemove) type = "pickupRemove";
+        else if(msgObj instanceof WallMessage) type="wall";
         else type = "id";
         jsonObject.add("type", new JsonPrimitive(type));
         if (type.equals("id")) msgObj.setId(id - 100);
