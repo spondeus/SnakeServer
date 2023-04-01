@@ -9,8 +9,6 @@ import lombok.val;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import snakeserver.dir.server.message.Message;
 import com.badlogic.gdx.graphics.Color;
@@ -21,7 +19,6 @@ import snakeserver.dir.server.message.pickups.Pickup;
 import snakeserver.dir.server.message.pickups.PickupRemove;
 import snakeserver.dir.server.message.pickups.ServerPickup;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -224,7 +221,6 @@ public class ServerSocket extends WebSocketServer {
                         jsonObject.add("id", new JsonPrimitive(x.getId()));
                         String type = "snakeConstruct";
                         jsonObject.add("type", new JsonPrimitive(type));
-                        String color = gson.toJson(Color.RED);
                         String innerJson = gson.toJson(msg);
                         jsonObject.add("data", new JsonPrimitive(innerJson));
                         String send = gson.toJson(jsonObject);
@@ -281,7 +277,7 @@ public class ServerSocket extends WebSocketServer {
         else if(msgObj instanceof PickupRemove) type="pickupRemove";
         else type = "id";
         jsonObject.add("type", new JsonPrimitive(type));
-        String color = gson.toJson(Color.RED);
+        if(type.equals("id")) msgObj.setId(id-100);
         String innerJson = gson.toJson(msgObj);
         jsonObject.add("data", new JsonPrimitive(innerJson));
         String msg = gson.toJson(jsonObject);
@@ -311,40 +307,10 @@ public class ServerSocket extends WebSocketServer {
         }
         // process body
         JsonObject innerJson;
-        if (type.startsWith("snake")) {
-            if (type.equals("snakeColorChange")) {
-                String data = jsonObject.get("data").getAsString();
-                SnakeColorChange snakeColorChange = gson.fromJson(data, SnakeColorChange.class);
-                int xCord,yCord;
-                if (snakeColorChange.getFirst() == -1) { // starter color
-                    switch(clientId){  // 1200*800
-                        case 0: xCord=yCord=25;break;
-                        case 1: xCord=25;yCord=755;break;
-                        case 2: xCord= 25;yCord=725;break;
-                        case 3: xCord= 1175;yCord=25;break;
-                        default:xCord=25;yCord=400;break;
-                    }
-                    snakeConstructs2.add(new SnakeConstruct(xCord, yCord, 20, snakeColorChange.getNewColor()));
-                }
-            }
-        } else if(type.startsWith("pickup")) {
-            if(type.equals("pickupRemove")){
-                int id=jsonObject.getAsJsonPrimitive("id").getAsInt();
-                String data = jsonObject.get("data").getAsString();
-                PickupRemove pickupRemove = gson.fromJson(data, PickupRemove.class);
-
-                pickupsClass.removePickupById(pickupRemove.getPickupId());
-                if (pickups().size() < minPickup) {
-                    for (int i = 0; i < 10-pickups().size(); i++){
-                        val newPickup = pickupsClass.newPickup();
-                        writeMsg(0, newPickup);
-                        pickupsClass.addPickup(newPickup);
-                    }
-                }
-                writeMsg(id, pickupRemove);
-            }
-        }
-
+        if (type.startsWith("snake")) snakeMsgHandler(jsonObject, clientId, type);
+        else if(type.startsWith("pickup")) pickupMsgHandler(jsonObject, type);
+        else if(type.equals("id")) dieMsgHandler(jsonObject,clientId);
+        else System.out.println("unknown message type");
 
 
 //            val msg = s.substring(4);
@@ -361,6 +327,48 @@ public class ServerSocket extends WebSocketServer {
 //            snakeConstructs.put(webSocket, builder.substring(0, builder.length()-1));
 //            System.out.println(builder.substring(0, builder.length()));
 
+    }
+
+    private void dieMsgHandler(JsonObject jsonObject, int clientId) {
+        /*    HUNORMETHOD(clientId,point)   */
+        Message dieMessage = gson.fromJson(jsonObject, Message.class);
+        writeMsg(clientId,dieMessage);
+    }
+
+    private void pickupMsgHandler(JsonObject jsonObject, String type) {
+        if(type.equals("pickupRemove")){
+            int id= jsonObject.getAsJsonPrimitive("id").getAsInt();
+            String data = jsonObject.get("data").getAsString();
+            PickupRemove pickupRemove = gson.fromJson(data, PickupRemove.class);
+
+            pickupsClass.removePickupById(pickupRemove.getPickupId());
+            if (pickups().size() < minPickup) {
+                for (int i = 0; i < 10-pickups().size(); i++){
+                    val newPickup = pickupsClass.newPickup();
+                    writeMsg(0, newPickup);
+                    pickupsClass.addPickup(newPickup);
+                }
+            }
+            writeMsg(id, pickupRemove);
+        }
+    }
+
+    private void snakeMsgHandler(JsonObject jsonObject, int clientId, String type) {
+        if (type.equals("snakeColorChange")) {
+            String data = jsonObject.get("data").getAsString();
+            SnakeColorChange snakeColorChange = gson.fromJson(data, SnakeColorChange.class);
+            int xCord,yCord;
+            if (snakeColorChange.getFirst() == -1) { // starter color
+                switch(clientId){  // 1200*800
+                    case 0: xCord=yCord=25;break;
+                    case 1: xCord=25;yCord=755;break;
+                    case 2: xCord= 25;yCord=725;break;
+                    case 3: xCord= 1175;yCord=25;break;
+                    default:xCord=25;yCord=400;break;
+                }
+                snakeConstructs2.add(new SnakeConstruct(xCord, yCord, 20, snakeColorChange.getNewColor()));
+            }
+        }
     }
 }
 
