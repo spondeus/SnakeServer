@@ -1,0 +1,211 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html lang="en" id="main" data-theme="dark" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/pico.min.css}" href="../static/css/pico.min.css">
+    <title>Log in</title>
+    <style>
+        * a{
+            user-select: none;
+            cursor: pointer;
+        }
+        ul:hover a {
+            opacity: .5;
+        }
+        ul:hover a:hover {
+            opacity: 1;
+            color: #000;
+            box-shadow: 0 2px 0 0 currentcolor;
+        }
+        ul:hover a{
+            transition: .25s ease;
+        }
+
+        body{
+            background-color: initial;
+        }
+        #nav-links a{
+            color: #d3d3d3;
+        }
+        #nav-links ion-icon{
+            margin: -0.1rem;
+            vertical-align: sub;
+            margin-left: 1.5rem;
+        }
+        nav{
+            margin-bottom: -2rem;
+        }
+        nav strong{
+            vertical-align: sub;
+        }
+        nav a{
+            margin-left: 1.5rem;
+            vertical-align: sub;
+        }
+        .dropdown ion-icon{
+            padding-top: 0.42rem;
+            position: page;
+        }
+
+        #about span{
+            width: 120%;
+            display: inline-flex;
+        }
+        #about{
+            cursor: pointer;
+        }
+        .login{
+            display: none;
+            margin: auto;
+            width: 50%;
+            outline: .3rem solid;
+            outline-color: #0c96bf;
+            outline-offset: 7px;
+            align-items: center;
+            align-content: center;
+            text-align: center;
+
+        }
+        .login h3{
+            text-align: center;
+            font-size: 1.7rem;
+        }
+        .login input{
+            place-content: center;
+            text-align: center;
+            align-items: center;
+            align-content: center;
+        }
+        .login button{
+            width: 50%;
+            margin-bottom: -1rem;
+        }
+        footer{
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+    </style>
+</head>
+
+<body onload="loadForm()">
+
+    <nav class="container">
+        <ul>
+            <li><strong style="font-size: 1.5rem;">PentaSnake</strong></li>
+            <li><a id="play" th:href="@{/home}" href="" role="button" class="contrast outline">Home</a></li>
+        </ul>
+        <ul id="nav-links">
+            <li><a sec:authorize="isAnonymous()" th:href="@{/registration}" onclick="showRegister()">Register</a></li>
+            <li role="list" dir="rtl" id="about">
+                <ion-icon name="list-outline"></ion-icon>
+                <ul role="listbox" class="dropdown">
+                    <li>
+                <span>
+                  <ion-icon class="about-list-icons" name="logo-github"></ion-icon>
+                  <a href="https://github.com/spondeus/SnakeClient">Github (Client)</a>
+                </span>
+                    </li>
+                    <li>
+                <span>
+                  <ion-icon class="about-list-icons" name="logo-github"></ion-icon>
+                  <a href="https://github.com/spondeus/SnakeServer">Github (Server)</a>
+                </span>
+                    </li>
+                    <li>
+                <span>
+                  <ion-icon class="about-list-icons" name="people"></ion-icon>
+                  <a href="#">Team</a>
+                </span>
+                    </li>
+                </ul>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <section class="login" id="login">
+            <h3>Log in</h3>
+            <form th:action="@{/login}" method="post">
+                <label for="username" th:if="${param.error}" onload="fieldError(username)"></label>
+                <input type="text" name="username" id="username" placeholder="Username" aria-invalid="none" required >
+
+                <label for="password"></label>
+                <input type="password" name="password" id="password" placeholder="Password" aria-invalid="none" required>
+
+                <div th:if="${param.error}" style="color: red">
+                    The Player Name or Password is incorrect!
+                </div>
+
+                <button type="submit" value="Login" role="button" class="contrast outline">Login</button>
+            </form>
+        </section>
+    </main>
+    <footer class="container">
+        <label for="switch" class=""></label>
+        <input onclick="switchTheme()" id="switch" type="checkbox" name="switch" role="switch" checked>Dark
+    </footer>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script>
+        var body = document.getElementById("main")
+        var navLinks = document.getElementById("nav-links")
+        let login = document.getElementById("login")
+        function loadForm(){
+            setTimeout(() => {
+                gridFadeInOut(login)
+            }, 500)
+        }
+
+        function gridFadeInOut(form){
+            if(!form instanceof HTMLElement){
+                return
+            }
+            if(form.style.display === "grid"){
+                form.style.transition = "opacity 0.5s ease-in-out";
+                form.style.opacity = "0";
+                setTimeout(() => {
+                    form.style.display = "none";
+                    form.style.opacity = "1";
+                }, 300);
+            } else {
+                form.style.transition = "opacity 0.5s ease-in-out";
+                form.style.opacity = "0";
+                form.style.display = "grid";
+                setTimeout(() => {
+                    form.style.opacity = "1";
+                }, 300);
+            }
+        }
+        function switchTheme() {
+            var dataTheme = body.getAttribute("data-theme")
+            if(dataTheme === "dark"){
+                body.setAttribute("data-theme", "light")
+                login.style.outlineColor = "black"
+                register.style.outlineColor = "black"
+                //nav link color
+                navLinks.querySelectorAll("a").forEach(function(link){
+                    link.style.color = "black"
+                })
+                body.style.backgroundColor = "darkgrey"
+            }
+            if(dataTheme === "light"){
+                body.setAttribute("data-theme", "dark")
+                login.style.outlineColor = "#0c96bf"
+                register.style.outlineColor = "#0c96bf"
+                //nav link color
+                navLinks.querySelectorAll("a").forEach(function(link){
+                    link.style.color = "#d3d3d3"
+                })
+                body.style.backgroundColor = ""
+            }
+        }
+    </script>
+</body>
+</html>

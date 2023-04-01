@@ -25,6 +25,10 @@
       ul:hover a{
         transition: .25s ease;
       }
+      #logout{
+        vertical-align: sub;
+        margin-top: 1.6rem;
+      }
 
       body{
         background-color: initial;
@@ -101,31 +105,34 @@
 </head>
 
 <body>
-  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
 
   <nav class="container">
     <ul>
       <li><strong style="font-size: 1.5rem;">PentaSnake</strong></li>
-      <li><a sec:authorize="isAuthenticated()" id="play" th:href="#{}" href="" role="button" class="contrast outline">Play</a></li>
+      <li><a sec:authorize="isAuthenticated()" id="play" th:href="@{/game}" href="" role="button" class="contrast outline">Play</a></li>
     </ul>
     <ul id="nav-links">
-      <li><a sec:authorize="isAnonymous()" href="#" onclick="showLogin()">Login</a></li>
-      <li><a sec:authorize="isAnonymous()" href="#" onclick="showRegister()">Register</a></li>
-      <li><a sec:authorize="isAuthenticated()" href="#" th:action="@{/logout}">Logout</a></li>
+      <li><a sec:authorize="isAnonymous()" th:href="@{/login}" onclick="showLogin()">Login</a></li>
+      <li><a sec:authorize="isAnonymous()" th:href="@{/registration}" onclick="showRegister()">Register</a></li>
+      <li>
+        <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()" id="logout">
+          <input type="submit" role="button" class="contrast outline" value="Logout" >
+        </form>
+      </li>
       <li role="list" dir="rtl" id="about">
         <ion-icon name="list-outline"></ion-icon>
         <ul role="listbox" class="dropdown">
           <li>
             <span>
               <ion-icon class="about-list-icons" name="logo-github"></ion-icon>
-              <a href="https://github.com/spondeus/SnakeClient">Github (Client)</a>
+              <a href="https://github.com/spondeus/SnakeClient" target="_blank">Github (Client)</a>
             </span>
           </li>
           <li>
             <span>
               <ion-icon class="about-list-icons" name="logo-github"></ion-icon>
-              <a href="https://github.com/spondeus/SnakeServer">Github (Server)</a>
+              <a href="https://github.com/spondeus/SnakeServer" target="_blank">Github (Server)</a>
             </span>
           </li>
           <li>
@@ -180,6 +187,9 @@
     <input onclick="switchTheme()" id="switch" type="checkbox" name="switch" role="switch" checked>Dark
   </footer>
 
+
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
   <script>
     var body = document.getElementById("main")
     var login = document.getElementById("login")
