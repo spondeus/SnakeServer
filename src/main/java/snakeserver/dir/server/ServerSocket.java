@@ -9,9 +9,9 @@ import lombok.val;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import snakeserver.dir.controller.PlayerController;
 import snakeserver.dir.server.message.Message;
 import com.badlogic.gdx.graphics.Color;
 import snakeserver.dir.server.message.SnakeColorChange;
@@ -21,7 +21,6 @@ import snakeserver.dir.server.message.pickups.Pickup;
 import snakeserver.dir.server.message.pickups.PickupRemove;
 import snakeserver.dir.server.message.pickups.ServerPickup;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -45,6 +44,10 @@ public class ServerSocket extends WebSocketServer {
 
     private ServerPickup pickupsClass = new ServerPickup();
     private final int minPickup = 5;
+
+    @Autowired
+    private PlayerController playerController;
+    private Map<Integer,Long> clientIdPlayerIdMap;
 
     public List<Pickup> pickups() {
         return pickupsClass.getPickups();
@@ -77,8 +80,8 @@ public class ServerSocket extends WebSocketServer {
 //            }
 //        }
         newClient.setId(ids.size());
+        clientIdPlayerIdMap.put(ids.size(),playerController.playerIpPlayerIdMap.get(clientAddress.getAddress().toString()));
         ids.add(ids.size());
-
 
 //        webSocket.send("id#"+newClient.getId());
         JsonObject jsonObject = new JsonObject();

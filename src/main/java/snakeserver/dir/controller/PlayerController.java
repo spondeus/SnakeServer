@@ -1,6 +1,5 @@
 package snakeserver.dir.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -9,10 +8,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import snakeserver.dir.authetication.PlayerService;
-import snakeserver.dir.emailsender.EmailSender;
 import snakeserver.dir.model.Player;
 import snakeserver.dir.model.PlayerRepository;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.security.Principal;
+import java.util.Map;
 
 
 @Controller
@@ -21,6 +23,7 @@ public class PlayerController {
     private final PlayerService playerService;
     private final PasswordEncoder passwordEncoder;
     private final PlayerRepository playerRepository;
+    public Map<String, Long> playerIpPlayerIdMap;
 
 
     public PlayerController(
@@ -82,7 +85,12 @@ public class PlayerController {
     }
 
     @GetMapping(path = {"/game"})
-    public String gamePage() {
+    public String gamePage(
+        Principal principal
+    ) throws UnknownHostException {
+        Player player = (Player) playerService.loadUserByUsername(principal.getName());
+        String ipAddress = InetAddress.getLocalHost().getHostAddress();
+        playerIpPlayerIdMap.put(ipAddress, player.getId());
         return "game";
     }
 
@@ -92,7 +100,6 @@ public class PlayerController {
     public String logoutPage() {
         return "redirect:/home";
     }
-
 
 
 }
