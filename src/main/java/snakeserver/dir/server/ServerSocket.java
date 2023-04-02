@@ -42,7 +42,7 @@ public class ServerSocket extends WebSocketServer {
     private boolean started = false;
 
     private ServerPickup pickupsClass = new ServerPickup();
-    private final int minPickup = 5;
+    private final int minPickup = 3;
 
     public List<Pickup> pickups() {
         return pickupsClass.getPickups();
@@ -234,13 +234,13 @@ public class ServerSocket extends WebSocketServer {
                 PickupRemove pickupRemove = gson.fromJson(data, PickupRemove.class);
                 for (var p: pickups())
                     if(p.getPickUpId() == pickupRemove.getPickupId())
-                        if(p.getType() == Type.GHOST){
+                        if(p.getType() == Type.GHOST) {
                             writeMsg(clientId, new TimedPickup(true, true));
                             executorService.schedule(() ->{
                                 writeMsg(clientId, new TimedPickup(true, false));
                             }, 10, TimeUnit.SECONDS);
                         }
-                        else if(p.getType() == Type.ICE){
+                        else if(p.getType() == Type.ICE) {
                             writeMsg(clientId, new TimedPickup(false, true));
                             executorService.schedule(() ->{
                                 writeMsg(clientId, new TimedPickup(false, false));
@@ -258,7 +258,6 @@ public class ServerSocket extends WebSocketServer {
                 }
             }
         }
-
     }
 }
 
