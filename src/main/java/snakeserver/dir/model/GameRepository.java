@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface GameRepository extends JpaRepository<Game, Long> {
 
-    @Query("select max(id) from Game")
+    @Query("select max(id) from snake_game")
     Long findMaxId();
 
     @NotNull
