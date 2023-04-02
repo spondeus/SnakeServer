@@ -28,4 +28,9 @@ public class Game {
     @OneToMany(mappedBy = "game")
     private List<Score> scores;
 
+    public Game(LocalDateTime begin_time, LocalDateTime end_time, boolean type) {
+        this.begin_time = begin_time;
+        this.end_time = end_time;
+        this.type = type;
+    }
 }
