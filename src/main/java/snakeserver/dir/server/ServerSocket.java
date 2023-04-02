@@ -230,11 +230,11 @@ public class ServerSocket extends WebSocketServer {
         Death dieMessage = gson.fromJson(jsonObject, Death.class);
         writeMsg(clientId, dieMessage);
         diedSnakes[clientId] = true;
-        int deadSnakes = 0;
-        for (boolean dead : diedSnakes) {
-            if (dead) deadSnakes++;
+        int alive = lobbySize;
+        for (boolean living : diedSnakes) {
+            if (living) alive--;
         }
-        if (lobbySize - deadSnakes == 1) {
+        if (alive==1) {
             Message msg = new Message();
             msg.setId(gameEndCode);
             writeMsg(gameEndCode, msg);    // game end message
@@ -249,7 +249,7 @@ public class ServerSocket extends WebSocketServer {
             Timer timer=new Timer();
             long delay=5000;
             timer.schedule(removeLastSnake,delay);
-        } else if (lobbySize == deadSnakes) winner(clientId);
+        } else if (alive==0) winner(clientId);
     }
 
     private void winner(int clientId) {
