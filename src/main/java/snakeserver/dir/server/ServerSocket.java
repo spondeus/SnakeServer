@@ -10,7 +10,9 @@ import lombok.val;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import snakeserver.dir.model.Repository;
 import snakeserver.dir.server.message.*;
 import com.badlogic.gdx.graphics.Color;
 import snakeserver.dir.server.message.pickups.Pickup;
@@ -43,13 +45,15 @@ public class ServerSocket extends WebSocketServer {
 
     private int[] points = new int[lobbySize];
 
-    private boolean[] diedSnakes = new boolean[lobbySize];
+    private boolean[] diedSnakes;
 
     public List<Pickup> pickups() {
         return pickupsClass.getPickups();
     }
 
-    private final int gameEndCode=999;
+    private final int gameEndCode = 999;
+    @Autowired
+    Repository pointRepository;
 
     public ServerSocket(InetSocket address) {
         super(address);
@@ -138,10 +142,10 @@ public class ServerSocket extends WebSocketServer {
 
                 }
 
-                WallMessage wallMessage=new WallMessage(Wall.spawnWalls());
-                for (var x:clients
-                     ) {
-                    writeMsg(x.getId(),wallMessage);
+                WallMessage wallMessage = new WallMessage(Wall.spawnWalls());
+                for (var x : clients
+                ) {
+                    writeMsg(x.getId(), wallMessage);
                 }
 
                 pickupsClass = new ServerPickup(10);
@@ -149,6 +153,7 @@ public class ServerSocket extends WebSocketServer {
                     writeMsg(p.getPickUpId(), p);
 
                 started = true;
+                diedSnakes = new boolean[lobbySize];
             }
         }
     }
@@ -179,17 +184,20 @@ public class ServerSocket extends WebSocketServer {
         else if (msgObj instanceof SnakeConstruct) type = "snakeConstruct";
         else if (msgObj instanceof Pickup) type = "pickupConst";
         else if (msgObj instanceof PickupRemove) type = "pickupRemove";
-        else if(msgObj instanceof WallMessage) type="wall";
-        else if(msgObj instanceof Death) type="death";
+        else if (msgObj instanceof WallMessage) type = "wall";
+        else if (msgObj instanceof Death) type = "death";
+        else if (msgObj instanceof Top10) type = "top10";
         else type = "id";
         jsonObject.add("type", new JsonPrimitive(type));
         if (type.equals("id")) msgObj.setId(id - 100);
         String innerJson = gson.toJson(msgObj);
         jsonObject.add("data", new JsonPrimitive(innerJson));
         String msg = gson.toJson(jsonObject);
-        for (var x : clients) {
-            x.getWebSocket().send(msg);
-        }
+        if (type.equals("top10")) clients.get(id).getWebSocket().send(msg);
+        else
+            for (var x : clients) {
+                x.getWebSocket().send(msg);
+            }
         System.out.println("sent:" + jsonObject);
     }
 
@@ -217,7 +225,12 @@ public class ServerSocket extends WebSocketServer {
         else if (type.startsWith("pickup")) pickupMsgHandler(jsonObject, type);
         else if (type.equals("death")) dieMsgHandler(jsonObject, clientId);
         else if (type.equals("score")) scoreMsgHandler(jsonObject, clientId);
+        else if (type.equals("points")) pointsMsgHandler(clientId);
         else System.out.println("unknown message type");
+    }
+
+    private void pointsMsgHandler(int clientId) {
+        writeMsg(clientId, new Top10(pointRepository.getTop10BasedOnScore()));
     }
 
     private void scoreMsgHandler(JsonObject jsonObject, int clientId) {
@@ -234,22 +247,22 @@ public class ServerSocket extends WebSocketServer {
         for (boolean living : diedSnakes) {
             if (living) alive--;
         }
-        if (alive==1) {
+        if (alive == 1) {
             Message msg = new Message();
             msg.setId(gameEndCode);
             writeMsg(gameEndCode, msg);    // game end message
-            TimerTask removeLastSnake=new TimerTask() {
+            TimerTask removeLastSnake = new TimerTask() {
                 @Override
                 public void run() {
                     Message msg = new Message();
-                    msg.setId(gameEndCode+1);
-                    writeMsg(gameEndCode+1, msg);    // return to main menu message
+                    msg.setId(gameEndCode + 1);
+                    writeMsg(gameEndCode + 1, msg);    // return to main menu message
                 }
             };
-            Timer timer=new Timer();
-            long delay=5000;
-            timer.schedule(removeLastSnake,delay);
-        } else if (alive==0) winner(clientId);
+            Timer timer = new Timer();
+            long delay = 5000;
+            timer.schedule(removeLastSnake, delay);
+        } else if (alive == 0) winner(clientId);
     }
 
     private void winner(int clientId) {
