@@ -12,6 +12,7 @@ import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import snakeserver.dir.save.SaveService;
 import snakeserver.dir.server.message.*;
 import snakeserver.dir.controller.PlayerController;
 import snakeserver.dir.server.message.Message;
@@ -46,9 +47,11 @@ public class ServerSocket extends WebSocketServer {
 
     @Autowired
     private PlayerController playerController;
+    @Autowired
+    private SaveService saveService;
     private Map<Integer,Long> clientIdPlayerIdMap;
 
-    private int[] points = new int[lobbySize];
+    private Long[] points = new Long[lobbySize];
 
     private boolean[] diedSnakes = new boolean[lobbySize];
 
@@ -223,7 +226,7 @@ public class ServerSocket extends WebSocketServer {
         JsonObject innerJson;
         if (type.startsWith("snake")) snakeMsgHandler(jsonObject, clientId, type);
         else if (type.startsWith("pickup")) pickupMsgHandler(jsonObject, type);
-        else if (type.equals("death")) dieMsgHandler(jsonObject, clientId);
+        else if (type.equals("death")) dieMsgHandler(jsonObject, (long) clientId);
         else if (type.equals("score")) scoreMsgHandler(jsonObject, clientId);
         else System.out.println("unknown message type");
     }
@@ -231,13 +234,13 @@ public class ServerSocket extends WebSocketServer {
     private void scoreMsgHandler(JsonObject jsonObject, int clientId) {
         String data = jsonObject.get("data").getAsString();
         ScoreMessage scoreMessage = gson.fromJson(data, ScoreMessage.class);
-        points[clientId] = scoreMessage.getScore();
+        points[clientId] = (long)scoreMessage.getScore();
     }
 
-    private void dieMsgHandler(JsonObject jsonObject, int clientId) {
+    private void dieMsgHandler(JsonObject jsonObject, Long clientId) {
         Death dieMessage = gson.fromJson(jsonObject, Death.class);
-        writeMsg(clientId, dieMessage);
-        diedSnakes[clientId] = true;
+        writeMsg((int) (long)clientId, dieMessage);
+        diedSnakes[(int) (long)clientId] = true;
         int deadSnakes = 0;
         for (boolean dead : diedSnakes) {
             if (dead) deadSnakes++;
@@ -260,9 +263,11 @@ public class ServerSocket extends WebSocketServer {
         } else if (lobbySize == deadSnakes) winner(clientId);
     }
 
-    private void winner(int clientId) {
+    private void winner(Long clientId) {
+        int intClientId = (int)(long)clientId;
         System.out.println("The winner SNAKE is #" + clientId);
-        System.out.println("Points: " + points[clientId]);
+        System.out.println("Points: " + points[intClientId]);
+        saveService.savePlayerScore(clientId,points[intClientId]);
     }
 
     private void pickupMsgHandler(JsonObject jsonObject, String type) {
