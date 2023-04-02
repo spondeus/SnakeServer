@@ -49,6 +49,8 @@ public class ServerSocket extends WebSocketServer {
         return pickupsClass.getPickups();
     }
 
+    private final int gameEndCode=999;
+
     public ServerSocket(InetSocket address) {
         super(address);
         this.start();
@@ -66,20 +68,9 @@ public class ServerSocket extends WebSocketServer {
         val clientAddress = webSocket.getRemoteSocketAddress();
         System.out.println("Client connected: " + clientAddress);
         val newClient = new Client(clientAddress, webSocket);
-
-//        while (true) {
-//            Integer random = new Random().nextInt(1, 10);
-//            if (!ids.contains(random)) {
-//                ids.add(random);
-//                newClient.setId(random);
-//                break;
-//            }
-//        }
         newClient.setId(ids.size());
         ids.add(ids.size());
 
-
-//        webSocket.send("id#"+newClient.getId());
         JsonObject jsonObject = new JsonObject();
         jsonObject.add("id", new JsonPrimitive(newClient.getId()));
         jsonObject.add("type", new JsonPrimitive("id"));
@@ -120,100 +111,6 @@ public class ServerSocket extends WebSocketServer {
     @Override
     public void onMessage(WebSocket webSocket, String s) {
         readMsg(s, webSocket);
-//        writeMsg(1,new SnakeConstruct(10,10,10, Color.BLUE));
-
-//        public void onMessage (WebSocket webSocket, String s){
-//
-//            if (s.startsWith("pickup")) {
-//                val msg = s.substring(6);
-//                val split = msg.split(",");
-//
-//                pickups.removePickupById(Integer.parseInt(split[1]));
-//                for (var x : clients)
-//                    x.getWebSocket().send("pickupRem#" + split[1]);
-//
-//                if (getPickups().size() < 5) {
-//                    pickups.addPickup(10 - getPickups().size());
-//                }
-//                for (var p : getPickups()) {
-//                    for (var c : clients) {
-//                        c.getWebSocket().send(p.toString());
-//                    }
-//                }
-//            }
-//
-//            if (!s.startsWith("input"))
-//                System.out.println(webSocket.getRemoteSocketAddress() + ": " + s);
-//            val builder = new StringBuilder();
-
-
-//        val builder = new StringBuilder();
-
-
-//
-//        if(s.startsWith("input")){       // SNAKE INPUT HANDLER
-//            val msg = s.substring(5);
-//            val split = msg.split(",");
-//            builder.append("input#");
-//            for(var x: split){
-//                builder.append(x).append("#");
-//            }
-//            for(var client: clients){
-//                client.getWebSocket().send(builder.toString());
-//            }
-//        }
-//
-//
-//        if(s.startsWith("cons")){       // SNAKE CONSTRUCT MESSAGE HANDLER
-//            val xCord = new Random().nextInt(100,500);
-//            val yCord = new Random().nextInt(100,500);
-//            val msg = s.substring(4);
-//            val split = msg.split(",");
-//            for(var x: split){
-//                if(x.equals("?1")){
-//                    builder.append(xCord).append(",");
-//                } else if (x.equals("?2")){
-//                    builder.append(yCord).append(",");
-//                } else{
-//                    builder.append(x).append(",");
-//                }
-//            }
-//            snakeConstructs.put(webSocket, builder.substring(0, builder.length()-1));
-//            System.out.println(builder.substring(0, builder.length()));
-//        }
-//
-//        if(clients.size() == lobbySize){        // LOBBY SIZE
-//            val string = new StringBuilder();
-//            string.append("cons#");
-//
-//            for(var x: snakeConstructs.values()){
-//                string.append(x).append("#");
-//            }
-//            for(var x: clients){
-//                x.getWebSocket().send(string.toString());
-//            }
-//        }
-//        if (clients.size() == lobbySize) {        // LOBBY SIZE
-//            pickups = new ServerPickup(10);
-//            System.out.println("pickups " + getPickups());
-//
-//            for (var c : clients) {
-//                for (var p : getPickups()) {
-//                    c.getWebSocket().send(p.toString());
-//                }
-//            }
-//
-//            val string = new StringBuilder();
-//            string.append("cons#");
-//
-//            for (var x : snakeConstructs.values()) {
-//                string.append(x).append("#");
-//            }
-//            for (var x : clients) {
-//                x.getWebSocket().send(string.toString());
-//            }
-//        }
-
         if (!started && clients.size() == lobbySize) {
             if (snakeConstructs2.size() == lobbySize) {
                 for (var msg : snakeConstructs2) {
@@ -283,6 +180,7 @@ public class ServerSocket extends WebSocketServer {
         else if (msgObj instanceof Pickup) type = "pickupConst";
         else if (msgObj instanceof PickupRemove) type = "pickupRemove";
         else if(msgObj instanceof WallMessage) type="wall";
+        else if(msgObj instanceof Death) type="death";
         else type = "id";
         jsonObject.add("type", new JsonPrimitive(type));
         if (type.equals("id")) msgObj.setId(id - 100);
@@ -317,25 +215,9 @@ public class ServerSocket extends WebSocketServer {
         JsonObject innerJson;
         if (type.startsWith("snake")) snakeMsgHandler(jsonObject, clientId, type);
         else if (type.startsWith("pickup")) pickupMsgHandler(jsonObject, type);
-        else if (type.equals("id")) dieMsgHandler(jsonObject, clientId);
+        else if (type.equals("death")) dieMsgHandler(jsonObject, clientId);
         else if (type.equals("score")) scoreMsgHandler(jsonObject, clientId);
         else System.out.println("unknown message type");
-
-
-//            val msg = s.substring(4);
-//            val split = msg.split(",");
-//            for(var x: split){
-//                if(x.equals("?1")){
-//                    builder.append(xCord).append(",");
-//                } else if (x.equals("?2")){
-//                    builder.append(yCord).append(",");
-//                } else{
-//                    builder.append(x).append(",");
-//                }
-//            }
-//            snakeConstructs.put(webSocket, builder.substring(0, builder.length()-1));
-//            System.out.println(builder.substring(0, builder.length()));
-
     }
 
     private void scoreMsgHandler(JsonObject jsonObject, int clientId) {
@@ -345,7 +227,7 @@ public class ServerSocket extends WebSocketServer {
     }
 
     private void dieMsgHandler(JsonObject jsonObject, int clientId) {
-        Message dieMessage = gson.fromJson(jsonObject, Message.class);
+        Death dieMessage = gson.fromJson(jsonObject, Death.class);
         writeMsg(clientId, dieMessage);
         diedSnakes[clientId] = true;
         int deadSnakes = 0;
@@ -354,7 +236,19 @@ public class ServerSocket extends WebSocketServer {
         }
         if (lobbySize - deadSnakes == 1) {
             Message msg = new Message();
-            writeMsg(999, msg);
+            msg.setId(gameEndCode);
+            writeMsg(gameEndCode, msg);    // game end message
+            TimerTask removeLastSnake=new TimerTask() {
+                @Override
+                public void run() {
+                    Message msg = new Message();
+                    msg.setId(gameEndCode+1);
+                    writeMsg(gameEndCode+1, msg);    // return to main menu message
+                }
+            };
+            Timer timer=new Timer();
+            long delay=5000;
+            timer.schedule(removeLastSnake,delay);
         } else if (lobbySize == deadSnakes) winner(clientId);
     }
 
@@ -413,19 +307,3 @@ public class ServerSocket extends WebSocketServer {
         }
     }
 }
-
-//        else if (type.startsWith("pickup")) ;
-//        else if (type.startsWith("wall")) ;
-//        else {
-//            switch (type) {
-//                case "id":
-//                    id = clientId;
-//                    break;
-//                case "die":
-//                    break;
-//                default:
-//                    System.err.println("Unknown message type!");
-//
-//            }
-//        }
-
