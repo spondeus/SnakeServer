@@ -12,23 +12,21 @@ import org.java_websocket.server.WebSocketServer;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import snakeserver.dir.server.message.Message;
+import snakeserver.dir.server.message.*;
 import com.badlogic.gdx.graphics.Color;
-import snakeserver.dir.server.message.SnakeColorChange;
-import snakeserver.dir.server.message.SnakeConstruct;
-import snakeserver.dir.server.message.SnakeMove;
-import snakeserver.dir.server.message.pickups.Pickup;
-import snakeserver.dir.server.message.pickups.PickupRemove;
-import snakeserver.dir.server.message.pickups.ServerPickup;
+import snakeserver.dir.server.message.pickups.*;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class ServerSocket extends WebSocketServer {
 
-    public int lobbySize = 2;   // LOBBY SIZE
+    public int lobbySize = 1;   // LOBBY SIZE
 
     public static ServerSocket socket;
 
@@ -49,6 +47,8 @@ public class ServerSocket extends WebSocketServer {
     public List<Pickup> pickups() {
         return pickupsClass.getPickups();
     }
+
+    ScheduledExecutorService executorService = Executors.newScheduledThreadPool(50);
 
     public ServerSocket(InetSocket address) {
         super(address);
@@ -121,99 +121,6 @@ public class ServerSocket extends WebSocketServer {
     @Override
     public void onMessage(WebSocket webSocket, String s) {
         readMsg(s, webSocket);
-//        writeMsg(1,new SnakeConstruct(10,10,10, Color.BLUE));
-
-//        public void onMessage (WebSocket webSocket, String s){
-//
-//            if (s.startsWith("pickup")) {
-//                val msg = s.substring(6);
-//                val split = msg.split(",");
-//
-//                pickups.removePickupById(Integer.parseInt(split[1]));
-//                for (var x : clients)
-//                    x.getWebSocket().send("pickupRem#" + split[1]);
-//
-//                if (getPickups().size() < 5) {
-//                    pickups.addPickup(10 - getPickups().size());
-//                }
-//                for (var p : getPickups()) {
-//                    for (var c : clients) {
-//                        c.getWebSocket().send(p.toString());
-//                    }
-//                }
-//            }
-//
-//            if (!s.startsWith("input"))
-//                System.out.println(webSocket.getRemoteSocketAddress() + ": " + s);
-//            val builder = new StringBuilder();
-
-
-//        val builder = new StringBuilder();
-
-
-//
-//        if(s.startsWith("input")){       // SNAKE INPUT HANDLER
-//            val msg = s.substring(5);
-//            val split = msg.split(",");
-//            builder.append("input#");
-//            for(var x: split){
-//                builder.append(x).append("#");
-//            }
-//            for(var client: clients){
-//                client.getWebSocket().send(builder.toString());
-//            }
-//        }
-//
-//
-//        if(s.startsWith("cons")){       // SNAKE CONSTRUCT MESSAGE HANDLER
-//            val xCord = new Random().nextInt(100,500);
-//            val yCord = new Random().nextInt(100,500);
-//            val msg = s.substring(4);
-//            val split = msg.split(",");
-//            for(var x: split){
-//                if(x.equals("?1")){
-//                    builder.append(xCord).append(",");
-//                } else if (x.equals("?2")){
-//                    builder.append(yCord).append(",");
-//                } else{
-//                    builder.append(x).append(",");
-//                }
-//            }
-//            snakeConstructs.put(webSocket, builder.substring(0, builder.length()-1));
-//            System.out.println(builder.substring(0, builder.length()));
-//        }
-//
-//        if(clients.size() == lobbySize){        // LOBBY SIZE
-//            val string = new StringBuilder();
-//            string.append("cons#");
-//
-//            for(var x: snakeConstructs.values()){
-//                string.append(x).append("#");
-//            }
-//            for(var x: clients){
-//                x.getWebSocket().send(string.toString());
-//            }
-//        }
-//        if (clients.size() == lobbySize) {        // LOBBY SIZE
-//            pickups = new ServerPickup(10);
-//            System.out.println("pickups " + getPickups());
-//
-//            for (var c : clients) {
-//                for (var p : getPickups()) {
-//                    c.getWebSocket().send(p.toString());
-//                }
-//            }
-//
-//            val string = new StringBuilder();
-//            string.append("cons#");
-//
-//            for (var x : snakeConstructs.values()) {
-//                string.append(x).append("#");
-//            }
-//            for (var x : clients) {
-//                x.getWebSocket().send(string.toString());
-//            }
-//        }
 
         if(!started && clients.size() == lobbySize){
             if(snakeConstructs2.size() == lobbySize){
@@ -277,6 +184,8 @@ public class ServerSocket extends WebSocketServer {
         else if (msgObj instanceof SnakeConstruct) type = "snakeConstruct";
         else if (msgObj instanceof Pickup) type = "pickupConst";
         else if(msgObj instanceof PickupRemove) type="pickupRemove";
+        else if(msgObj instanceof SnakeSpeedChange) type = "speedChange";
+        else if(msgObj instanceof SnakePointChange) type = "pointChange";
         else type = "id";
         jsonObject.add("type", new JsonPrimitive(type));
         String color = gson.toJson(Color.RED);
@@ -323,6 +232,21 @@ public class ServerSocket extends WebSocketServer {
             if(type.equals("pickupRemove")){
                 String data = jsonObject.get("data").getAsString();
                 PickupRemove pickupRemove = gson.fromJson(data, PickupRemove.class);
+                for (var p: pickups())
+                    if(p.getPickUpId() == pickupRemove.getPickupId())
+                        if(p.getType() == Type.GHOST){
+                            writeMsg(clientId, new TimedPickup(true, true));
+                            executorService.schedule(() ->{
+                                writeMsg(clientId, new TimedPickup(true, false));
+                            }, 10, TimeUnit.SECONDS);
+                        }
+                        else if(p.getType() == Type.ICE){
+                            writeMsg(clientId, new TimedPickup(false, true));
+                            executorService.schedule(() ->{
+                                writeMsg(clientId, new TimedPickup(false, false));
+                            }, 5, TimeUnit.SECONDS);
+                        }
+
                 pickupsClass.removePickupById(pickupRemove.getPickupId());
                 if (pickups().size() < minPickup) {
                     for (int i = 0; i < 10-pickups().size(); i++){
@@ -330,26 +254,10 @@ public class ServerSocket extends WebSocketServer {
                         writeMsg(0, newPickup);
                         pickupsClass.addPickup(newPickup);
                     }
+                    writeMsg(clientId, pickupRemove);
                 }
-                writeMsg(clientId, pickupRemove);
             }
         }
-
-
-
-//            val msg = s.substring(4);
-//            val split = msg.split(",");
-//            for(var x: split){
-//                if(x.equals("?1")){
-//                    builder.append(xCord).append(",");
-//                } else if (x.equals("?2")){
-//                    builder.append(yCord).append(",");
-//                } else{
-//                    builder.append(x).append(",");
-//                }
-//            }
-//            snakeConstructs.put(webSocket, builder.substring(0, builder.length()-1));
-//            System.out.println(builder.substring(0, builder.length()));
 
     }
 }
