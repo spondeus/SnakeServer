@@ -11,5 +11,5 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
     @NotNull
     @Override
-    Game getReferenceById(Long aLong);
+    Game getReferenceById(@NotNull Long aLong);
 }
