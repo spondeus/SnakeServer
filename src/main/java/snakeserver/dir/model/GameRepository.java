@@ -6,5 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 public interface GameRepository extends JpaRepository<Game, Long> {
 
     @Query("select max(id) from Game")
-    Game findMaxGameId();
+    Long findMaxId();
+
+    @Override
+    Game getReferenceById(Long aLong);
 }
