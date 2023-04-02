@@ -14,6 +14,7 @@ import snakeserver.dir.model.PlayerRepository;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -23,7 +24,7 @@ public class PlayerController {
     private final PlayerService playerService;
     private final PasswordEncoder passwordEncoder;
     private final PlayerRepository playerRepository;
-    public Map<String, Long> playerIpPlayerIdMap;
+    public final Map<String, Long> playerIpPlayerIdMap = new HashMap<>();
 
 
     public PlayerController(

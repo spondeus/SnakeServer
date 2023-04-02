@@ -49,7 +49,7 @@ public class ServerSocket extends WebSocketServer {
     private PlayerController playerController;
     @Autowired
     private SaveService saveService;
-    private Map<Integer,Long> clientIdPlayerIdMap;
+    private Map<Integer,Long> clientIdPlayerIdMap = new HashMap<>();
 
     private Long[] points = new Long[lobbySize];
 
