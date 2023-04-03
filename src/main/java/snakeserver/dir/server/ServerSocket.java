@@ -107,6 +107,8 @@ public class ServerSocket extends WebSocketServer {
                 ids.remove(x.getId());
         }
 
+        webSocket.close();
+
         clients.removeIf(x -> x.getRemoteAddress() == clientAddress);
 
         System.out.println("Client disconnected: " + clientAddress);
@@ -262,7 +264,9 @@ public class ServerSocket extends WebSocketServer {
                 public void run() {
                     Message msg = new Message();
                     msg.setId(gameEndCode + 1);
-                    writeMsg(gameEndCode + 1, msg);    // return to main menu message
+                    writeMsg(gameEndCode + 1, msg);     // return to main menu message
+                    for(var c: clients)
+                        c.getWebSocket().close();
                 }
             };
             Timer timer = new Timer();
