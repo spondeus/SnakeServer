@@ -340,7 +340,7 @@ public class ServerSocket extends WebSocketServer {
             SnakeColorChange snakeColorChange = gson.fromJson(data, SnakeColorChange.class);
             int xCord = 0, yCord = 0;
             int xPush = 195, yPush = 25;
-            int w = 1200, h = 600;
+            int w = 1200, h = 720;
             if (snakeColorChange.getFirst() == -1) { // starter color
                 switch (clientId) {  // 1200*800
                     case 0:
