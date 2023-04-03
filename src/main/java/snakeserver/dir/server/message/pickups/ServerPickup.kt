@@ -23,7 +23,7 @@ class ServerPickup()
 		pickups.add(pickup)
 	}
 
-	fun newPickup(): Pickup{
+	fun newPickup(): Pickup {
 		val random = Random().nextInt(1,7)
 		while(true){
 			val id = Random().nextInt(1,100)

@@ -102,7 +102,7 @@ public class ServerSocket extends WebSocketServer {
         val clientAddress = webSocket.getRemoteSocketAddress();
 
         for (var x : clients){
-            snakeConstructs2.remove();
+            snakeConstructs2.removeIf(sc -> sc.getId() == x.getId());
             if (x.getWebSocket() == webSocket)
                 ids.remove(x.getId());
         }
