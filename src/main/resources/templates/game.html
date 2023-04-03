@@ -1,0 +1,129 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html lang="en" id="main" data-theme="dark" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/pico.min.css}" href="pico.min.css">
+    <title>Game</title>
+    <style>
+        * a{
+            user-select: none;
+            cursor: pointer;
+        }
+        ul:hover a {
+            opacity: .5;
+        }
+        ul:hover a:hover {
+            opacity: 1;
+            color: #000;
+            box-shadow: 0 2px 0 0 currentcolor;
+        }
+        ul:hover a{
+            transition: .25s ease;
+        }
+        ​
+        body{
+            background-color: initial;
+        }
+        #nav-links a{
+            color: #d3d3d3;
+        }
+        #nav-links ion-icon{
+            margin: -0.1rem;
+            vertical-align: sub;
+            margin-left: 1.5rem;
+        }
+        nav{
+            margin-bottom: -2rem;
+        }
+        nav strong{
+            vertical-align: sub;
+        }
+        nav a{
+            margin-left: 1.5rem;
+            vertical-align: sub;
+        }
+        .dropdown ion-icon{
+            padding-top: 0.42rem;
+            position: page;
+        }
+        ​
+        #about span{
+            width: 120%;
+            display: inline-flex;
+        }
+        #about{
+            cursor: pointer;
+        }
+        .login{
+            display: grid;
+            align-items: center;
+            align-content: center;
+            text-align: center;
+            margin-top: 10rem;
+        }
+        .login h3{
+            text-align: center;
+            font-size: 1.7rem;
+        }
+        .login input{
+            place-content: center;
+            text-align: center;
+            align-items: center;
+            align-content: center;
+        }
+        .login button{
+            width: 50%;
+            margin-bottom: -1rem;
+        }
+        footer{
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+        ​
+        ​
+    </style>
+</head>
+<body>
+<nav class="container">
+    <ul>
+        <li><strong style="font-size: 1.5rem;">PentaSnake</strong></li>
+        <li><a id="play" th:href="@{/home}" href="" role="button" class="contrast outline">Home</a></li>
+    </ul>
+    <ul id="nav-links">
+        <li role="list" dir="rtl" id="about">
+            <ion-icon name="list-outline"></ion-icon>
+            <ul role="listbox" class="dropdown">
+                <li>
+                    <span>
+                      <ion-icon class="about-list-icons" name="logo-github"></ion-icon>
+                      <a href="https://github.com/spondeus/SnakeClient" target="_blank">Github (Client)</a>
+                    </span>
+                </li>
+                <li>
+                    <span>
+                      <ion-icon class="about-list-icons" name="logo-github"></ion-icon>
+                      <a href="https://github.com/spondeus/SnakeServer" target="_blank">Github (Server)</a>
+                    </span>
+                </li>
+                <li>
+                    <span>
+                      <ion-icon class="about-list-icons" name="people"></ion-icon>
+                      <a href="#">Team</a>
+                    </span>
+                </li>
+            </ul>
+    </ul>
+</nav>
+<main class="container">
+    <section class="login">
+        <h1>You can start the game now!</h1>
+    </section>
+</main>
+</body>
+</html>
