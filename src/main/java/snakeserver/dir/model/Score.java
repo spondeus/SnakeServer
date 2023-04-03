@@ -18,12 +18,20 @@ public class Score {
 
     @ManyToOne
     @MapsId("snake_player_id")
+    @JoinColumn(referencedColumnName = "id")
     private Player player;
 
     @ManyToOne
     @MapsId("snake_game_id")
+    @JoinColumn(referencedColumnName = "id")
     private Game game;
 
     private Long score;
 
+    public Score(ScoreId score_id, Player player, Game game, Long score) {
+        this.score_id = new ScoreId(player.getId(), game.getId());
+        this.player = player;
+        this.game = game;
+        this.score = score;
+    }
 }

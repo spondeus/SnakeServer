@@ -1,5 +1,6 @@
 package snakeserver.dir.server;
 
+import com.badlogic.gdx.utils.SnapshotArray;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -12,7 +13,11 @@ import org.java_websocket.server.WebSocketServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import snakeserver.dir.model.Repository;
+import snakeserver.dir.save.SaveService;
 import snakeserver.dir.server.message.*;
+import snakeserver.dir.controller.PlayerController;
+import snakeserver.dir.server.message.Message;
+import com.badlogic.gdx.graphics.Color;
 import snakeserver.dir.server.message.pickups.Pickup;
 import snakeserver.dir.server.message.pickups.PickupRemove;
 import snakeserver.dir.server.message.pickups.ServerPickup;
@@ -45,7 +50,13 @@ public class ServerSocket extends WebSocketServer {
     private ServerPickup pickupsClass = new ServerPickup();
     private final int minPickup = 4;
 
-    private int[] points = new int[lobbySize];
+    @Autowired
+    private PlayerController playerController;
+    @Autowired
+    private SaveService saveService;
+    private Map<Integer,Long> clientIdPlayerIdMap = new HashMap<>();
+
+    private Long[] points = new Long[lobbySize];
 
     private boolean[] diedSnakes;
 
@@ -77,6 +88,7 @@ public class ServerSocket extends WebSocketServer {
         System.out.println("Client connected: " + clientAddress);
         val newClient = new Client(clientAddress, webSocket);
         newClient.setId(ids.size());
+        clientIdPlayerIdMap.put(ids.size(),playerController.playerIpPlayerIdMap.get(clientAddress.getAddress().toString()));
         ids.add(ids.size());
 
         JsonObject jsonObject = new JsonObject();
@@ -233,6 +245,8 @@ public class ServerSocket extends WebSocketServer {
         if (type.startsWith("snake")) snakeMsgHandler(jsonObject, clientId, type);
         else if (type.startsWith("pickup")) pickupMsgHandler(jsonObject, type,clientId);
         else if (type.equals("death")) dieMsgHandler(jsonObject, clientId);
+        else if (type.startsWith("pickup")) pickupMsgHandler(jsonObject, type);
+        else if (type.equals("death")) dieMsgHandler(jsonObject, (long) clientId);
         else if (type.equals("score")) scoreMsgHandler(jsonObject, clientId);
         else if (type.equals("points")) pointsMsgHandler(clientId);
         else System.out.println("unknown message type");
@@ -245,11 +259,16 @@ public class ServerSocket extends WebSocketServer {
     private void scoreMsgHandler(JsonObject jsonObject, int clientId) {
         String data = jsonObject.get("data").getAsString();
         ScoreMessage scoreMessage = gson.fromJson(data, ScoreMessage.class);
-        points[clientId] = scoreMessage.getScore();
+        points[clientId] = (long)scoreMessage.getScore();
     }
 
-    private void dieMsgHandler(JsonObject jsonObject, int clientId) {
+    private void dieMsgHandler(JsonObject jsonObject, Long clientId) {
         Death dieMessage = gson.fromJson(jsonObject, Death.class);
+        writeMsg((int) (long)clientId, dieMessage);
+        diedSnakes[(int) (long)clientId] = true;
+        int deadSnakes = 0;
+        for (boolean dead : diedSnakes) {
+            if (dead) deadSnakes++;
         writeMsg(clientId, dieMessage);
         diedSnakes[clientId] = true;
         int alive = lobbySize;
@@ -276,9 +295,11 @@ public class ServerSocket extends WebSocketServer {
         } else if (alive == 0) winner(clientId);
     }
 
-    private void winner(int clientId) {
+    private void winner(Long clientId) {
+        int intClientId = (int)(long)clientId;
         System.out.println("The winner SNAKE is #" + clientId);
-        System.out.println("Points: " + points[clientId]);
+        System.out.println("Points: " + points[intClientId]);
+        saveService.savePlayerScore(clientId,points[intClientId]);
     }
 
     private void pickupMsgHandler(JsonObject jsonObject, String type, int clientId) {
