@@ -16,7 +16,7 @@ class ServerPickup()
 	}
 
 	fun reset(){
-		pickups.removeAll(pickups);
+		pickups.removeAll(pickups)
 	}
 
 	fun addPickup(pickup: Pickup){
@@ -24,7 +24,7 @@ class ServerPickup()
 	}
 
 	fun newPickup(): Pickup{
-		val random = Random().nextInt(1,6)
+		val random = Random().nextInt(1,7)
 		while(true){
 			val id = Random().nextInt(1,100)
 			if(!ids.contains(id)){
@@ -34,7 +34,7 @@ class ServerPickup()
 						id,
 						Vector2(
 							Random().nextInt(100, 1100).toFloat(),
-							Random().nextInt(100, 700).toFloat(),
+							Random().nextInt(100, 700).toFloat()
 						))
 			}
 		}

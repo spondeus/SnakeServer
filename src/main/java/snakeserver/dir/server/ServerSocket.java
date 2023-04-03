@@ -1,6 +1,5 @@
 package snakeserver.dir.server;
 
-import com.badlogic.gdx.utils.SnapshotArray;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -10,17 +9,24 @@ import lombok.val;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import snakeserver.dir.model.Repository;
+import snakeserver.dir.server.message.*;
 import snakeserver.dir.server.message.*;
 import com.badlogic.gdx.graphics.Color;
 import snakeserver.dir.server.message.pickups.Pickup;
 import snakeserver.dir.server.message.pickups.PickupRemove;
 import snakeserver.dir.server.message.pickups.ServerPickup;
+import snakeserver.dir.server.message.pickups.*;
 
+import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class ServerSocket extends WebSocketServer {
@@ -41,7 +47,7 @@ public class ServerSocket extends WebSocketServer {
     private boolean started = false;
 
     private ServerPickup pickupsClass = new ServerPickup();
-    private final int minPickup = 5;
+    private final int minPickup = 3;
 
     private int[] points = new int[lobbySize];
 
@@ -54,6 +60,8 @@ public class ServerSocket extends WebSocketServer {
     private final int gameEndCode = 999;
     @Autowired
     Repository pointRepository;
+
+    ScheduledExecutorService executorService = Executors.newScheduledThreadPool(50);
 
     public ServerSocket(InetSocket address) {
         super(address);
@@ -137,7 +145,7 @@ public class ServerSocket extends WebSocketServer {
                 jsonObject.add("id", new JsonPrimitive(-1));
                 jsonObject.add("type", new JsonPrimitive("id"));
                 String msg = gson.toJson(jsonObject);
-                for (var c : clients) {
+                for(var c: clients){
                     c.getWebSocket().send(msg);
 
                 }
@@ -149,7 +157,7 @@ public class ServerSocket extends WebSocketServer {
                 }
 
                 pickupsClass = new ServerPickup(10);
-                for (var p : pickups())
+                for(var p: pickups())
                     writeMsg(p.getPickUpId(), p);
 
                 started = true;
@@ -209,7 +217,7 @@ public class ServerSocket extends WebSocketServer {
         JsonElement msgType = jsonObject.get("type");
         String type = msgType.getAsString();
 
-        if (!type.equals("snakeMove")) {
+        if(!type.equals("snakeMove")){
             System.out.println(webSocket.getRemoteSocketAddress() + ": " + s);
         }
 

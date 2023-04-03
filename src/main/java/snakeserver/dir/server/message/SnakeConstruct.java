@@ -5,10 +5,11 @@ import com.badlogic.gdx.graphics.Color;
 public class SnakeConstruct extends Message {
     private int x;
     private int y;
+    private String pos;
     private int radius;
     private Color color;
 
-    public SnakeConstruct( int x, int y, int radius, Color color) {
+    public SnakeConstruct(int x, int y, int radius, Color color) {
         this.x = x;
         this.y = y;
         this.radius = radius;

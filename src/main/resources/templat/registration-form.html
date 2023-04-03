@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration</title>
+</head>
+<body>
+<h1>New Player</h1>
+<form
+        data-th-object="${newuser}"
+        method="post"
+        data-th-action="@{/registration}"
+        action="/registration"
+>
+    <label for="player">Player Name</label>
+    <input id="player" type="text" data-th-field="*{name}">
+
+
+    <label for="email">Email</label>
+    <input id="email" type="email" data-th-field="*{email}">
+
+
+    <label for="password">Password</label>
+    <input id="password" type="password" data-th-field="*{password}">
+    <input type="submit" value="Save">
+    <div>
+    <p
+            style="color: red;"
+            data-th-if="${#fields.hasErrors('name')}"
+            data-th-errors="*{name}"
+    ></p>
+    <p th:if="${nameError}" class="error" style="color: red;" >This Player Name already exists!</p>
+
+    <p
+            style="color: red;"
+            data-th-if="${#fields.hasErrors('email')}"
+            data-th-errors="*{email}"
+    ></p>
+    <p th:if="${emailError}" class="error"  style="color: red;">This email address already exists!</p>
+
+    <p
+            style="color: red;"
+            data-th-if="${#fields.hasErrors('password')}"
+            data-th-errors="*{password}"
+    ></p>
+
+    </div>
+
+</form>
+<a href="/home"><BUTTON>Home</BUTTON></a>
+</body>
+</html>
