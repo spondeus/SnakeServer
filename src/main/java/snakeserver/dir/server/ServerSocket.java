@@ -314,24 +314,25 @@ public class ServerSocket extends WebSocketServer {
             if (snakeColorChange.getFirst() == -1) { // starter color
                 switch (clientId) {  // 1200*800
                     case 0:
-                        xCord = yCord = 25;
+                        xCord = 100;
+                        yCord = 25;
                         break;
                     case 1:
-                        xCord = 25;
-                        yCord = 755;
+                        xCord = 1200-100;
+                        yCord = 800-25;
                         break;
                     case 2:
                         xCord = 25;
-                        yCord = 725;
+                        yCord = 800-100;
                         break;
                     case 3:
-                        xCord = 1175;
-                        yCord = 25;
+                        xCord = 800-25;
+                        yCord = 1200-25;
                         break;
-                    default:
-                        xCord = 25;
-                        yCord = 400;
-                        break;
+//                    default:
+//                        xCord = 25;
+//                        yCord = 400;
+//                        break;
                 }
                 snakeConstructs2.add(new SnakeConstruct(xCord, yCord, 20, snakeColorChange.getNewColor()));
             }
