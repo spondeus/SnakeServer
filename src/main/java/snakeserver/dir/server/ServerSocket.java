@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class ServerSocket extends WebSocketServer {
 
-    public int lobbySize = 2;   // LOBBY SIZE
+    public int lobbySize = 1;   // LOBBY SIZE
 
     public static ServerSocket socket;
 
@@ -43,7 +43,7 @@ public class ServerSocket extends WebSocketServer {
     private boolean started = false;
 
     private ServerPickup pickupsClass = new ServerPickup();
-    private final int minPickup = 3;
+    private final int minPickup = 4;
 
     private int[] points = new int[lobbySize];
 
@@ -297,6 +297,7 @@ public class ServerSocket extends WebSocketServer {
                         }, 5, TimeUnit.SECONDS);
                     }
             pickupsClass.removePickupById(pickupRemove.getPickupId());
+            System.out.println(pickups().size());
             if (pickups().size() < minPickup) {
                 for (int i = 0; i < 10 - pickups().size(); i++) {
                     val newPickup = pickupsClass.newPickup();
@@ -304,6 +305,7 @@ public class ServerSocket extends WebSocketServer {
                     pickupsClass.addPickup(newPickup);
                 }
             }
+
             writeMsg(id, pickupRemove);
         }
     }

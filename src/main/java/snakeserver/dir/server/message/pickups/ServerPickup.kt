@@ -10,9 +10,11 @@ class ServerPickup()
 
 	fun removePickupById(id: Int){
 		ids.remove(id)
+		var pickup: Pickup? = null
 		for(p in pickups)
-			if(p.id == id)
-				pickups.remove(p)
+			if(p.pickUpId == id)
+				pickup = p
+		pickups.remove(pickup)
 	}
 
 	fun reset(){
