@@ -303,7 +303,7 @@ public class ServerSocket extends WebSocketServer {
         int intClientId = (int) (long) clientId;
         System.out.println("The winner SNAKE is #" + clientId);
         System.out.println("Points: " + points[intClientId]);
-        saveService.savePlayerScore(clientId, points[intClientId]);
+        saveService.savePlayerScore(clientId+1, points[intClientId]);
     }
 
     private void pickupMsgHandler(JsonObject jsonObject, String type, int clientId) {
