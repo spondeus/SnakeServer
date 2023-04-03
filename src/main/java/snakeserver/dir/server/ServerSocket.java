@@ -9,19 +9,15 @@ import lombok.val;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import snakeserver.dir.model.Repository;
 import snakeserver.dir.server.message.*;
-import snakeserver.dir.server.message.*;
-import com.badlogic.gdx.graphics.Color;
 import snakeserver.dir.server.message.pickups.Pickup;
 import snakeserver.dir.server.message.pickups.PickupRemove;
 import snakeserver.dir.server.message.pickups.ServerPickup;
 import snakeserver.dir.server.message.pickups.*;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -230,7 +226,7 @@ public class ServerSocket extends WebSocketServer {
         // process body
         JsonObject innerJson;
         if (type.startsWith("snake")) snakeMsgHandler(jsonObject, clientId, type);
-        else if (type.startsWith("pickup")) pickupMsgHandler(jsonObject, type);
+        else if (type.startsWith("pickup")) pickupMsgHandler(jsonObject, type,clientId);
         else if (type.equals("death")) dieMsgHandler(jsonObject, clientId);
         else if (type.equals("score")) scoreMsgHandler(jsonObject, clientId);
         else if (type.equals("points")) pointsMsgHandler(clientId);
@@ -278,12 +274,26 @@ public class ServerSocket extends WebSocketServer {
         System.out.println("Points: " + points[clientId]);
     }
 
-    private void pickupMsgHandler(JsonObject jsonObject, String type) {
+    private void pickupMsgHandler(JsonObject jsonObject, String type, int clientId) {
+
         if (type.equals("pickupRemove")) {
             int id = jsonObject.getAsJsonPrimitive("id").getAsInt();
             String data = jsonObject.get("data").getAsString();
             PickupRemove pickupRemove = gson.fromJson(data, PickupRemove.class);
-
+            for (var p: pickups())
+                if(p.getPickUpId() == pickupRemove.getPickupId())
+                    if(p.getType() == Type.GHOST) {
+                        writeMsg(clientId, new TimedPickup(true, true));
+                        executorService.schedule(() ->{
+                            writeMsg(clientId, new TimedPickup(true, false));
+                        }, 10, TimeUnit.SECONDS);
+                    }
+                    else if(p.getType() == Type.ICE) {
+                        writeMsg(clientId, new TimedPickup(false, true));
+                        executorService.schedule(() ->{
+                            writeMsg(clientId, new TimedPickup(false, false));
+                        }, 5, TimeUnit.SECONDS);
+                    }
             pickupsClass.removePickupById(pickupRemove.getPickupId());
             if (pickups().size() < minPickup) {
                 for (int i = 0; i < 10 - pickups().size(); i++) {
