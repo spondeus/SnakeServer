@@ -54,7 +54,7 @@ public class ServerSocket extends WebSocketServer {
     private PlayerController playerController;
     @Autowired
     private SaveService saveService;
-    private Map<Integer,Long> clientIdPlayerIdMap = new HashMap<>();
+    private Map<Integer, Long> clientIdPlayerIdMap = new HashMap<>();
 
     private Long[] points = new Long[lobbySize];
 
@@ -88,7 +88,7 @@ public class ServerSocket extends WebSocketServer {
         System.out.println("Client connected: " + clientAddress);
         val newClient = new Client(clientAddress, webSocket);
         newClient.setId(ids.size());
-        clientIdPlayerIdMap.put(ids.size(),playerController.playerIpPlayerIdMap.get(clientAddress.getAddress().toString()));
+        clientIdPlayerIdMap.put(ids.size(), playerController.playerIpPlayerIdMap.get(clientAddress.getAddress().toString()));
         ids.add(ids.size());
 
         JsonObject jsonObject = new JsonObject();
@@ -158,7 +158,7 @@ public class ServerSocket extends WebSocketServer {
                 jsonObject.add("id", new JsonPrimitive(-1));
                 jsonObject.add("type", new JsonPrimitive("id"));
                 String msg = gson.toJson(jsonObject);
-                for(var c: clients){
+                for (var c : clients) {
                     c.getWebSocket().send(msg);
 
                 }
@@ -170,7 +170,7 @@ public class ServerSocket extends WebSocketServer {
                 }
 
                 pickupsClass = new ServerPickup(10);
-                for(var p: pickups())
+                for (var p : pickups())
                     writeMsg(p.getPickUpId(), p);
 
                 started = true;
@@ -230,7 +230,7 @@ public class ServerSocket extends WebSocketServer {
         JsonElement msgType = jsonObject.get("type");
         String type = msgType.getAsString();
 
-        if(!type.equals("snakeMove")){
+        if (!type.equals("snakeMove")) {
             System.out.println(webSocket.getRemoteSocketAddress() + ": " + s);
         }
 
@@ -243,9 +243,7 @@ public class ServerSocket extends WebSocketServer {
         // process body
         JsonObject innerJson;
         if (type.startsWith("snake")) snakeMsgHandler(jsonObject, clientId, type);
-        else if (type.startsWith("pickup")) pickupMsgHandler(jsonObject, type,clientId);
-        else if (type.equals("death")) dieMsgHandler(jsonObject, clientId);
-        else if (type.startsWith("pickup")) pickupMsgHandler(jsonObject, type);
+        else if (type.startsWith("pickup")) pickupMsgHandler(jsonObject, type, clientId);
         else if (type.equals("death")) dieMsgHandler(jsonObject, (long) clientId);
         else if (type.equals("score")) scoreMsgHandler(jsonObject, clientId);
         else if (type.equals("points")) pointsMsgHandler(clientId);
@@ -259,47 +257,48 @@ public class ServerSocket extends WebSocketServer {
     private void scoreMsgHandler(JsonObject jsonObject, int clientId) {
         String data = jsonObject.get("data").getAsString();
         ScoreMessage scoreMessage = gson.fromJson(data, ScoreMessage.class);
-        points[clientId] = (long)scoreMessage.getScore();
+        points[clientId] = (long) scoreMessage.getScore();
     }
 
     private void dieMsgHandler(JsonObject jsonObject, Long clientId) {
         Death dieMessage = gson.fromJson(jsonObject, Death.class);
-        writeMsg((int) (long)clientId, dieMessage);
-        diedSnakes[(int) (long)clientId] = true;
+        writeMsg((int) (long) clientId, dieMessage);
+        diedSnakes[(int) (long) clientId] = true;
         int deadSnakes = 0;
         for (boolean dead : diedSnakes) {
             if (dead) deadSnakes++;
-        writeMsg(clientId, dieMessage);
-        diedSnakes[clientId] = true;
-        int alive = lobbySize;
-        for (boolean living : diedSnakes) {
-            if (living) alive--;
+            writeMsg((int) (long) clientId, dieMessage);
+            diedSnakes[(int) (long) clientId] = true;
+            int alive = lobbySize;
+            for (boolean living : diedSnakes) {
+                if (living) alive--;
+            }
+            if (alive == 1) {
+                Message msg = new Message();
+                msg.setId(gameEndCode);
+                writeMsg(gameEndCode, msg);    // game end message
+                TimerTask removeLastSnake = new TimerTask() {
+                    @Override
+                    public void run() {
+                        Message msg = new Message();
+                        msg.setId(gameEndCode + 1);
+                        writeMsg(gameEndCode + 1, msg);     // return to main menu message
+                        for (var c : clients)
+                            c.getWebSocket().close();
+                    }
+                };
+                Timer timer = new Timer();
+                long delay = 5000;
+                timer.schedule(removeLastSnake, delay);
+            } else if (alive == 0) winner(clientId);
         }
-        if (alive == 1) {
-            Message msg = new Message();
-            msg.setId(gameEndCode);
-            writeMsg(gameEndCode, msg);    // game end message
-            TimerTask removeLastSnake = new TimerTask() {
-                @Override
-                public void run() {
-                    Message msg = new Message();
-                    msg.setId(gameEndCode + 1);
-                    writeMsg(gameEndCode + 1, msg);     // return to main menu message
-                    for(var c: clients)
-                        c.getWebSocket().close();
-                }
-            };
-            Timer timer = new Timer();
-            long delay = 5000;
-            timer.schedule(removeLastSnake, delay);
-        } else if (alive == 0) winner(clientId);
     }
 
     private void winner(Long clientId) {
-        int intClientId = (int)(long)clientId;
+        int intClientId = (int) (long) clientId;
         System.out.println("The winner SNAKE is #" + clientId);
         System.out.println("Points: " + points[intClientId]);
-        saveService.savePlayerScore(clientId,points[intClientId]);
+        saveService.savePlayerScore(clientId, points[intClientId]);
     }
 
     private void pickupMsgHandler(JsonObject jsonObject, String type, int clientId) {
@@ -308,17 +307,16 @@ public class ServerSocket extends WebSocketServer {
             int id = jsonObject.getAsJsonPrimitive("id").getAsInt();
             String data = jsonObject.get("data").getAsString();
             PickupRemove pickupRemove = gson.fromJson(data, PickupRemove.class);
-            for (var p: pickups())
-                if(p.getPickUpId() == pickupRemove.getPickupId())
-                    if(p.getType() == Type.GHOST) {
+            for (var p : pickups())
+                if (p.getPickUpId() == pickupRemove.getPickupId())
+                    if (p.getType() == Type.GHOST) {
                         writeMsg(clientId, new TimedPickup(true, true));
-                        executorService.schedule(() ->{
+                        executorService.schedule(() -> {
                             writeMsg(clientId, new TimedPickup(true, false));
                         }, 10, TimeUnit.SECONDS);
-                    }
-                    else if(p.getType() == Type.ICE) {
+                    } else if (p.getType() == Type.ICE) {
                         writeMsg(clientId, new TimedPickup(false, true));
-                        executorService.schedule(() ->{
+                        executorService.schedule(() -> {
                             writeMsg(clientId, new TimedPickup(false, false));
                         }, 5, TimeUnit.SECONDS);
                     }
@@ -340,9 +338,9 @@ public class ServerSocket extends WebSocketServer {
         if (type.equals("snakeColorChange")) {
             String data = jsonObject.get("data").getAsString();
             SnakeColorChange snakeColorChange = gson.fromJson(data, SnakeColorChange.class);
-            int xCord=0, yCord=0;
-            int xPush=195,yPush=25;
-            int w=1200,h=600;
+            int xCord = 0, yCord = 0;
+            int xPush = 195, yPush = 25;
+            int w = 1200, h = 600;
             if (snakeColorChange.getFirst() == -1) { // starter color
                 switch (clientId) {  // 1200*800
                     case 0:
@@ -350,15 +348,15 @@ public class ServerSocket extends WebSocketServer {
                         yCord = yPush;
                         break;
                     case 1:
-                        xCord = w-xPush;
-                        yCord = h-yPush;
+                        xCord = w - xPush;
+                        yCord = h - yPush;
                         break;
                     case 2:
                         xCord = yPush;
-                        yCord = h-xPush;
+                        yCord = h - xPush;
                         break;
                     case 3:
-                        xCord = w-yPush;
+                        xCord = w - yPush;
                         yCord = xPush;
                         break;
 //                    default:
@@ -370,4 +368,5 @@ public class ServerSocket extends WebSocketServer {
             }
         }
     }
+
 }
