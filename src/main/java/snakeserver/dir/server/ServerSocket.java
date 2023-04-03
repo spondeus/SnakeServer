@@ -283,6 +283,11 @@ public class ServerSocket extends WebSocketServer {
                         Message msg = new Message();
                         msg.setId(gameEndCode + 1);
                         writeMsg(gameEndCode + 1, msg);     // return to main menu message
+                        try {
+                            Thread.sleep(4000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
                         for (var c : clients)
                             c.getWebSocket().close();
                     }

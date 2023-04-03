@@ -22,10 +22,7 @@ public class SaveService {
     public void savePlayerScore(Long id, Long score) {
         Player player = playerRepository.findPlayerById(id);
         Game game = gameRepository.getReferenceById(gameRepository.findMaxId());
-        Score newScore = new Score();
-        newScore.setPlayer(player);
-        newScore.setGame(game);
-        newScore.setScore(score);
+        Score newScore = new Score(player,game,score);
         scoreRepository.save(newScore);
     }
 

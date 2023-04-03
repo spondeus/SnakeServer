@@ -28,7 +28,7 @@ public class Score {
 
     private Long score;
 
-    public Score(ScoreId score_id, Player player, Game game, Long score) {
+    public Score(Player player, Game game, Long score) {
         this.score_id = new ScoreId(player.getId(), game.getId());
         this.player = player;
         this.game = game;
