@@ -310,24 +310,26 @@ public class ServerSocket extends WebSocketServer {
         if (type.equals("snakeColorChange")) {
             String data = jsonObject.get("data").getAsString();
             SnakeColorChange snakeColorChange = gson.fromJson(data, SnakeColorChange.class);
-            int xCord, yCord;
+            int xCord=0, yCord=0;
+            int xPush=195,yPush=25;
+            int w=1200,h=600;
             if (snakeColorChange.getFirst() == -1) { // starter color
                 switch (clientId) {  // 1200*800
                     case 0:
-                        xCord = 100;
-                        yCord = 25;
+                        xCord = xPush;
+                        yCord = yPush;
                         break;
                     case 1:
-                        xCord = 1200-100;
-                        yCord = 800-25;
+                        xCord = w-xPush;
+                        yCord = h-yPush;
                         break;
                     case 2:
-                        xCord = 25;
-                        yCord = 800-100;
+                        xCord = yPush;
+                        yCord = h-xPush;
                         break;
                     case 3:
-                        xCord = 800-25;
-                        yCord = 1200-25;
+                        xCord = w-yPush;
+                        yCord = xPush;
                         break;
 //                    default:
 //                        xCord = 25;
