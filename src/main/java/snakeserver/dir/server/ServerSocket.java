@@ -59,6 +59,7 @@ public class ServerSocket extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
+
         if (clients.size() >= lobbySize) {
             webSocket.closeConnection(0, "server full");
             return;
@@ -68,17 +69,8 @@ public class ServerSocket extends WebSocketServer {
         System.out.println("Client connected: " + clientAddress);
         val newClient = new Client(clientAddress, webSocket);
 
-//        while (true) {
-//            Integer random = new Random().nextInt(1, 10);
-//            if (!ids.contains(random)) {
-//                ids.add(random);
-//                newClient.setId(random);
-//                break;
-//            }
-//        }
         newClient.setId(ids.size());
         ids.add(ids.size());
-
 
 //        webSocket.send("id#"+newClient.getId());
         JsonObject jsonObject = new JsonObject();
@@ -184,7 +176,7 @@ public class ServerSocket extends WebSocketServer {
         else if (msgObj instanceof SnakeConstruct) type = "snakeConstruct";
         else if (msgObj instanceof Pickup) type = "pickupConst";
         else if(msgObj instanceof PickupRemove) type="pickupRemove";
-        else if(msgObj instanceof SnakeSpeedChange) type = "speedChange";
+        else if(msgObj instanceof TimedPickup) type = "pickupTimed";
         else if(msgObj instanceof SnakePointChange) type = "pointChange";
         else type = "id";
         jsonObject.add("type", new JsonPrimitive(type));
