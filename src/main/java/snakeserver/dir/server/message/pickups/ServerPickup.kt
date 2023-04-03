@@ -34,7 +34,7 @@ class ServerPickup()
 						id,
 						Vector2(
 							Random().nextInt(100, 1100).toFloat(),
-							Random().nextInt(100, 700).toFloat()
+							Random().nextInt(100, 500).toFloat()
 						))
 			}
 		}

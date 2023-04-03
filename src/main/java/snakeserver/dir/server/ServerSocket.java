@@ -101,9 +101,11 @@ public class ServerSocket extends WebSocketServer {
     public void onClose(WebSocket webSocket, int i, String s, boolean b) {
         val clientAddress = webSocket.getRemoteSocketAddress();
 
-        for (var x : clients)
+        for (var x : clients){
+            snakeConstructs2.remove();
             if (x.getWebSocket() == webSocket)
                 ids.remove(x.getId());
+        }
 
         clients.removeIf(x -> x.getRemoteAddress() == clientAddress);
 
