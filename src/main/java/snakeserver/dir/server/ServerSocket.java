@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class ServerSocket extends WebSocketServer {
 
-    public int lobbySize = 4;   // LOBBY SIZE
+    public int lobbySize = 1;   // LOBBY SIZE
 
     public static ServerSocket socket;
 
@@ -116,6 +116,9 @@ public class ServerSocket extends WebSocketServer {
     public void onClose(WebSocket webSocket, int i, String s, boolean b) {
         val clientAddress = webSocket.getRemoteSocketAddress();
 
+        for(var c: clients){
+            c.getWebSocket().close();
+        }
 //        for (var x : clients){
 //            snakeConstructs2.removeIf(sc -> sc.getId() == x.getId());
 //            if (x.getWebSocket() == webSocket)
