@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class ServerSocket extends WebSocketServer {
 
-    public int lobbySize = 1;   // LOBBY SIZE
+    public int lobbySize = 3;   // LOBBY SIZE
 
     public static ServerSocket socket;
 
