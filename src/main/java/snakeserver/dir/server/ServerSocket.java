@@ -289,8 +289,9 @@ public class ServerSocket extends WebSocketServer {
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
-                        for (var c : clients)
+                        for (var c : clients){
                             c.getWebSocket().close();
+                        }
                     }
                 };
                 Timer timer = new Timer();
