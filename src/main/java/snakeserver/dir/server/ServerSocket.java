@@ -1,6 +1,5 @@
 package snakeserver.dir.server;
 
-import com.badlogic.gdx.utils.SnapshotArray;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -17,7 +16,6 @@ import snakeserver.dir.save.SaveService;
 import snakeserver.dir.server.message.*;
 import snakeserver.dir.controller.PlayerController;
 import snakeserver.dir.server.message.Message;
-import com.badlogic.gdx.graphics.Color;
 import snakeserver.dir.server.message.pickups.Pickup;
 import snakeserver.dir.server.message.pickups.PickupRemove;
 import snakeserver.dir.server.message.pickups.ServerPickup;
@@ -61,7 +59,7 @@ public class ServerSocket extends WebSocketServer {
     private boolean[] diedSnakes;
 
     public List<Pickup> pickups() {
-        return pickupsClass.getPickups();
+        return pickupsClass.getItems();
     }
 
     private final int gameEndCode = 999;
@@ -169,7 +167,10 @@ public class ServerSocket extends WebSocketServer {
                     writeMsg(x.getId(), wallMessage);
                 }
 
-                pickupsClass = new ServerPickup(10);
+                pickupsClass = new ServerPickup();
+                for (int i = 0; i < 10; i++) {
+                    pickupsClass.addPickup(pickupsClass.newPickup());
+                }
                 for (var p : pickups())
                     writeMsg(p.getPickUpId(), p);
 
