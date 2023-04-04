@@ -1,5 +1,7 @@
 package snakeserver.dir.server.message.pickups;
 
+import java.util.Random;
+
 public enum Type {
     FOOD(6, 0.5f),
     POISON(4, 0.25f),
@@ -24,6 +26,22 @@ public enum Type {
     }
 
     public static Type getRandomType() {
-        return values()[(int) (Math.random() * values().length)];
+
+        int random = new Random().nextInt(1,101);
+
+        if (random >= 1 && random <= 31){
+            return Type.FOOD;
+        } else if (random > 31 && random <= 46) {
+            return Type.POISON;
+        } else if (random > 46 && random <= 61) {
+            return Type.DRINK;
+        } else if (random > 61 && random <= 76) {
+            return Type.WEB;
+        } else if (random > 76 && random <= 91) {
+            return Type.ICE;
+        } else {
+            return Type.GHOST;
+        }
     }
+
 }

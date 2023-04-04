@@ -13,10 +13,8 @@ public class ServerPickup {
     public List<Pickup> getItems() {
         return items;
     }
-    private static Set<Integer> ids = new HashSet<>();
+    private Set<Integer> ids = new HashSet<>();
 
-    private static int pickupId = 0;
-    private static int nextPickupId = pickupId++;
     int padding = 60;
     final int HEIGHT = 600;
     final int WIDTH = 1200;
@@ -40,27 +38,31 @@ public class ServerPickup {
             }};
             if (!pickupPositions.contains(temp)) {
                 pickupPositions.add(temp);
-                return PickupFactory.createRandomPickup(x,y);
+                return createRandomPickup(x,y);
             }
         }
     }
 
-    private static class PickupFactory {
-        public static Pickup createRandomPickup(float x, float y) {
-            var id = -1;
-            while(true){
-                val rand = new Random().nextInt(1,101);
-                if(!ids.contains(rand)){
-                    ids.add(rand);
-                    id = rand;
-                    break;
-                }
+    public Pickup createRandomPickup(float x, float y) {
+        var id = -1;
+        while(true){
+            val rand = new Random().nextInt(1,101);
+            if(!ids.contains(rand)){
+                ids.add(rand);
+                id = rand;
+                break;
             }
-            Type type = Type.getRandomType();
-            Vector2 position = new Vector2(x, y);
-            Pickup pickup = new Pickup(type, id, position);
-            return pickup;
         }
+        Type type = Type.getRandomType();
+        Vector2 position = new Vector2(x, y);
+        Pickup pickup = new Pickup(type, id, position);
+        var typenum = 0;
+        for(var t: items)
+            if(t.getType() == type)
+                typenum++;
+        if(typenum >= type.getMaxAmount())
+            newPickup();
+        return pickup;
     }
 
     public void removePickupById(int id){
