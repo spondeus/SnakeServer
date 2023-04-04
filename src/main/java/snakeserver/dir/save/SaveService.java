@@ -4,6 +4,7 @@ package snakeserver.dir.save;
 import org.springframework.stereotype.Service;
 import snakeserver.dir.model.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -36,7 +37,7 @@ public class SaveService {
     }
 
     public void saveGame(){
-        Game game = new Game(null,null,true);
+        Game game = new Game(LocalDateTime.now(),LocalDateTime.now(),true);
         gameRepository.save(game);
     }
 
