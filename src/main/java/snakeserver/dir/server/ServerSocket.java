@@ -52,7 +52,7 @@ public class ServerSocket extends WebSocketServer {
     private PlayerController playerController;
     @Autowired
     private SaveService saveService;
-    private Map<Integer, Long> clientIdPlayerIdMap = new HashMap<>();
+    private final Map<Integer, Long> clientIdPlayerIdMap = new HashMap<>();
 
     private Long[] points = new Long[lobbySize];
 
@@ -86,7 +86,11 @@ public class ServerSocket extends WebSocketServer {
         System.out.println("Client connected: " + clientAddress);
         val newClient = new Client(clientAddress, webSocket);
         newClient.setId(ids.size());
-        clientIdPlayerIdMap.put(ids.size(), playerController.playerIpPlayerIdMap.get(clientAddress.getAddress().toString()));
+        if (playerController.playerIpPlayerIdMap.get(clientAddress.getAddress().toString()) == null){
+            clientIdPlayerIdMap.put(ids.size(), 1L);
+        }else{
+            clientIdPlayerIdMap.put(ids.size(), playerController.playerIpPlayerIdMap.get(clientAddress.getAddress().toString()));
+        }
         ids.add(ids.size());
 
         JsonObject jsonObject = new JsonObject();
@@ -289,22 +293,23 @@ public class ServerSocket extends WebSocketServer {
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
-                        for (var c : clients)
+                        for (var c : clients){
                             c.getWebSocket().close();
+                        }
                     }
                 };
                 Timer timer = new Timer();
                 long delay = 5000;
                 timer.schedule(removeLastSnake, delay);
-            } else if (alive == 0) winner(clientId);
+            } else if (alive == 0) winner(clientId, clientIdPlayerIdMap.get((int) (long) clientId));
         }
     }
 
-    private void winner(Long clientId) {
+    private void winner(Long clientId, Long playerId) {
         int intClientId = (int) (long) clientId;
         System.out.println("The winner SNAKE is #" + clientId);
         System.out.println("Points: " + points[intClientId]);
-        saveService.savePlayerScore(clientId+1, points[intClientId]);
+        saveService.savePlayerScore(playerId, points[intClientId]);
     }
 
     private void pickupMsgHandler(JsonObject jsonObject, String type, int clientId) {

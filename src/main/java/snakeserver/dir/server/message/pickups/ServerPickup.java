@@ -1,6 +1,8 @@
 package snakeserver.dir.server.message.pickups;
 
 import com.badlogic.gdx.math.Vector2;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import lombok.val;
 
 import java.util.*;
 
@@ -11,10 +13,14 @@ public class ServerPickup {
     public List<Pickup> getItems() {
         return items;
     }
+    private static Set<Integer> ids = new HashSet<>();
 
     private static int pickupId = 0;
     private static int nextPickupId = pickupId++;
     int padding = 60;
+    final int HEIGHT = 600;
+    final int WIDTH = 1200;
+
     private Set<List<Integer>> pickupPositions = new HashSet<>();
 
     public ServerPickup() {
@@ -23,9 +29,6 @@ public class ServerPickup {
     public Pickup newPickup() {
 
         while (true) {
-
-            final int HEIGHT = 600;
-            final int WIDTH = 1200;
             int x,y;
 
             x = new Random().nextInt(padding, WIDTH - padding);
@@ -44,15 +47,25 @@ public class ServerPickup {
 
     private static class PickupFactory {
         public static Pickup createRandomPickup(float x, float y) {
+            var id = -1;
+            while(true){
+                val rand = new Random().nextInt(1,101);
+                if(!ids.contains(rand)){
+                    ids.add(rand);
+                    id = rand;
+                    break;
+                }
+            }
             Type type = Type.getRandomType();
             Vector2 position = new Vector2(x, y);
-            Pickup pickup = new Pickup(type, nextPickupId, position);
+            Pickup pickup = new Pickup(type, id, position);
             return pickup;
         }
     }
 
     public void removePickupById(int id){
         Pickup temp = null;
+        ids.remove(id);
 
         for (Pickup item : items) {
             if (item.getPickUpId() == id) {
