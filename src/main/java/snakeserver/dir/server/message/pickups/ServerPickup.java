@@ -15,7 +15,6 @@ public class ServerPickup {
     private static int pickupId = 0;
     private static int nextPickupId = pickupId++;
     int padding = 60;
-
     private Set<List<Integer>> pickupPositions = new HashSet<>();
 
     public ServerPickup() {
@@ -36,7 +35,7 @@ public class ServerPickup {
                 add(x);
                 add(y);
             }};
-            if (pickupPositions.contains(temp)) {
+            if (!pickupPositions.contains(temp)) {
                 pickupPositions.add(temp);
                 return PickupFactory.createRandomPickup(x,y);
             }
