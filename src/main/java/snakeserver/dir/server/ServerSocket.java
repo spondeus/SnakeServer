@@ -86,12 +86,11 @@ public class ServerSocket extends WebSocketServer {
         System.out.println("Client connected: " + clientAddress);
         val newClient = new Client(clientAddress, webSocket);
         newClient.setId(ids.size());
-        clientIdPlayerIdMap.put(ids.size(), 1L);
-//        if (playerController.playerIpPlayerIdMap.get(clientAddress.getAddress().toString()) == null){
-//            clientIdPlayerIdMap.put(ids.size(), 1L);
-//        }else{
-//            clientIdPlayerIdMap.put(ids.size(), playerController.playerIpPlayerIdMap.get(clientAddress.getAddress().toString()));
-//        }
+        if (playerController.playerIpPlayerIdMap.isEmpty()){
+            clientIdPlayerIdMap.put(ids.size(), 1L);
+        }else{
+            clientIdPlayerIdMap.put(ids.size(), playerController.playerIpPlayerIdMap.get(clientAddress.getAddress().toString()));
+        }
         ids.add(ids.size());
 
         JsonObject jsonObject = new JsonObject();
