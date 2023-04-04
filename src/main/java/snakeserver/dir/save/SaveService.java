@@ -35,4 +35,9 @@ public class SaveService {
 
     }
 
+    public void saveGame(){
+        Game game = new Game(null,null,true);
+        gameRepository.save(game);
+    }
+
 }

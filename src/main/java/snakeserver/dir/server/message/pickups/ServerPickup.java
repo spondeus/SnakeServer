@@ -60,8 +60,10 @@ public class ServerPickup {
         for(var t: items)
             if(t.getType() == type)
                 typenum++;
-        if(typenum >= type.getMaxAmount())
-            newPickup();
+        if(typenum >= type.getMaxAmount()){
+            System.out.println("Too many of these items: "+type);
+            return newPickup();
+        }
         return pickup;
     }
 

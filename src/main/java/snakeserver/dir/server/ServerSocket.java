@@ -116,6 +116,9 @@ public class ServerSocket extends WebSocketServer {
     public void onClose(WebSocket webSocket, int i, String s, boolean b) {
         val clientAddress = webSocket.getRemoteSocketAddress();
 
+        for(var c: clients){
+            c.getWebSocket().close();
+        }
 //        for (var x : clients){
 //            snakeConstructs2.removeIf(sc -> sc.getId() == x.getId());
 //            if (x.getWebSocket() == webSocket)
@@ -307,6 +310,7 @@ public class ServerSocket extends WebSocketServer {
     }
 
     private void winner(Long clientId, Long playerId) {
+        saveService.saveGame();
         int intClientId = (int) (long) clientId;
         System.out.println("The winner SNAKE is #" + clientId);
         System.out.println("Points: " + points[intClientId]);
