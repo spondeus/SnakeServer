@@ -21,7 +21,6 @@ public class ServerPickup {
     final int HEIGHT = 600;
     final int WIDTH = 1200;
 
-
     private Set<List<Integer>> pickupPositions = new HashSet<>();
 
     public ServerPickup() {

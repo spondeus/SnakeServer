@@ -26,6 +26,7 @@ public enum Type {
     }
 
     public static Type getRandomType() {
+
         int random = new Random().nextInt(1,101);
 
         if (random >= 1 && random <= 31){
