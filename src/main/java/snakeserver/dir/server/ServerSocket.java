@@ -310,6 +310,7 @@ public class ServerSocket extends WebSocketServer {
     }
 
     private void winner(Long clientId, Long playerId) {
+        saveService.saveGame();
         int intClientId = (int) (long) clientId;
         System.out.println("The winner SNAKE is #" + clientId);
         System.out.println("Points: " + points[intClientId]);
