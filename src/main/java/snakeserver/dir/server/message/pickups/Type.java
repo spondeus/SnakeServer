@@ -40,7 +40,6 @@ public enum Type {
             return Type.ICE;
         } else {
             return Type.GHOST;
-
         }
     }
 }
