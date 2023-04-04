@@ -43,4 +43,5 @@ public enum Type {
             return Type.GHOST;
         }
     }
+
 }
