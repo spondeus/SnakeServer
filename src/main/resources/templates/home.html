@@ -112,6 +112,9 @@
       <li><strong style="font-size: 1.5rem;">PentaSnake</strong></li>
       <li><a sec:authorize="isAuthenticated()" id="play" th:href="@{/game}" href="" role="button" class="contrast outline">Play</a></li>
     </ul>
+    <ul>
+      <li sec:authorize="isAuthenticated()" style="color: #b71c1c">You're logged in</li>
+    </ul>
     <ul id="nav-links">
       <li><a sec:authorize="isAnonymous()" th:href="@{/login}" onclick="showLogin()">Login</a></li>
       <li><a sec:authorize="isAnonymous()" th:href="@{/registration}" onclick="showRegister()">Register</a></li>
