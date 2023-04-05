@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class ServerSocket extends WebSocketServer {
 
-    public int lobbySize = 3;   // LOBBY SIZE
+    public int lobbySize = 1;   // LOBBY SIZE
 
     public static ServerSocket socket;
 
@@ -176,7 +176,7 @@ public class ServerSocket extends WebSocketServer {
 
                 pickupsClass = new ServerPickup();
                 for (int i = 0; i < 10; i++) {
-                    pickupsClass.addPickup(pickupsClass.newPickup());
+                    pickupsClass.addPickup(pickupsClass.newPickup(wallMessage.getWallList()));
                 }
                 for (var p : pickups())
                     writeMsg(p.getPickUpId(), p);
@@ -248,10 +248,18 @@ public class ServerSocket extends WebSocketServer {
             }
             return;
         }
+
+
+        WallMessage wallMessage = null;
+        if (type.startsWith("pickup")) {
+            wallMessage = new WallMessage(Wall.spawnWalls());
+            wallMessage.setWallList(wallMessage.getWallList());
+        }
+
         // process body
         JsonObject innerJson;
         if (type.startsWith("snake")) snakeMsgHandler(jsonObject, clientId, type);
-        else if (type.startsWith("pickup")) pickupMsgHandler(jsonObject, type, clientId);
+        else if (type.startsWith("pickup")) pickupMsgHandler(jsonObject, type, clientId, wallMessage);
         else if (type.equals("death")) dieMsgHandler(jsonObject, (long) clientId);
         else if (type.equals("score")) scoreMsgHandler(jsonObject, clientId);
         else if (type.equals("points")) pointsMsgHandler(clientId);
@@ -316,7 +324,7 @@ public class ServerSocket extends WebSocketServer {
         saveService.savePlayerScore(playerId, points[intClientId]);
     }
 
-    private void pickupMsgHandler(JsonObject jsonObject, String type, int clientId) {
+    private void pickupMsgHandler(JsonObject jsonObject, String type, int clientId, WallMessage walls) {
 
         if (type.equals("pickupRemove")) {
             int id = jsonObject.getAsJsonPrimitive("id").getAsInt();
@@ -339,7 +347,7 @@ public class ServerSocket extends WebSocketServer {
             System.out.println(pickups().size());
             if (pickups().size() < minPickup) {
                 for (int i = 0; i < 10 - pickups().size(); i++) {
-                    val newPickup = pickupsClass.newPickup();
+                    val newPickup = pickupsClass.newPickup(walls.getWallList());
                     writeMsg(0, newPickup);
                     pickupsClass.addPickup(newPickup);
                 }
