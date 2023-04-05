@@ -53,7 +53,7 @@ public class ServerSocket extends WebSocketServer {
         }
     }
 
-    public int lobbySize = 1;   // LOBBY SIZE
+    public int lobbySize = 2;   // LOBBY SIZE
 
     public static ServerSocket socket;
 
@@ -408,10 +408,10 @@ public class ServerSocket extends WebSocketServer {
                         xCord = w - yPush;
                         yCord = xPush;
                         break;
-//                    default:
-//                        xCord = 25;
-//                        yCord = 400;
-//                        break;
+                    default:
+                        xCord = w/2;
+                        yCord = h/2;
+                        break;
                 }
                 snakeConstructs2.add(new SnakeConstruct(xCord, yCord, 20, snakeColorChange.getNewColor()));
             }

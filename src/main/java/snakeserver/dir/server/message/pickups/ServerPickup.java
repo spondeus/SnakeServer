@@ -18,7 +18,7 @@ public class ServerPickup {
     private Set<Integer> ids = new HashSet<>();
 
     int padding = 60;
-    final int HEIGHT = 720;
+    final int HEIGHT = 800;
     final int WIDTH = 1200;
 
     private Set<List<Integer>> pickupPositions = new HashSet<>();
