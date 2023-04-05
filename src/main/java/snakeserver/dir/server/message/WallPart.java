@@ -1,7 +1,9 @@
 package snakeserver.dir.server.message;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 public class WallPart extends Rectangle {
 

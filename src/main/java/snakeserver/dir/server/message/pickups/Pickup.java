@@ -8,9 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 public class Pickup extends Message {
     @Getter @Setter
     private Type type;
-
     private final int pickUpId;
-
     @Getter @Setter
     private Vector2 position;
 
@@ -22,17 +20,8 @@ public class Pickup extends Message {
         this.type = type;
         this.pickUpId = id;
         this.position = position;
-    }
 
-    /*
-    @Override
-    public String toString(){
-        return String.format(
-                "%s#%s#%d#%d#%d",msg,type,id, (int) position.x(),(int) position.y()
-        );
     }
-
-     */
 
     @Override
     public String toString() {

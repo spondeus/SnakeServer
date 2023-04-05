@@ -50,13 +50,6 @@ public class WallPattern {
         straightLong.add(straight);
         wallPatterns.add(new WallPattern(straightLong));
 
-        /*SnapshotArray<WallPart> crossShaped = new SnapshotArray<>();
-        WallPart crossVertical = new WallPart(550, 630, 50, 150, Color.FIREBRICK);
-        WallPart crossHorizontal = new WallPart(500, 650, 150, 50, Color.FIREBRICK);
-        crossShaped.add(crossVertical);
-        crossShaped.add(crossHorizontal);
-        wallPatterns.add(new WallPattern(crossShaped));*/
-
         SnapshotArray<WallPart> uShaped = new SnapshotArray<>();
         WallPart uLeft = new WallPart(500, 700, 50, 30, Color.FIREBRICK);
         WallPart uMiddle = new WallPart(500, 650, 250, 50, Color.FIREBRICK);

@@ -17,10 +17,9 @@ public class ServerPickup {
     }
     private Set<Integer> ids = new HashSet<>();
 
-    int padding = 60;
+    int padding = 120;
     final int HEIGHT = 800;
     final int WIDTH = 1200;
-
     private Set<List<Integer>> pickupPositions = new HashSet<>();
 
     public ServerPickup() {
@@ -28,18 +27,23 @@ public class ServerPickup {
 
     public Pickup newPickup(SnapshotArray<WallPattern> walls) {
 
+        final int PICKUP_RADIUS = 10;
+
         Random random = new Random();
 
         while (true) {
-            int x,y;
-
-            x = random.nextInt(padding, WIDTH - padding);
-            y = random.nextInt(padding, HEIGHT - padding);
+            int x = random.nextInt(padding, WIDTH - padding);
+            int y = random.nextInt(padding, HEIGHT - padding);
+            final int MIN_DISTANCE = 50;
 
             boolean insideWall = false;
-            for (WallPattern wall : walls) {
-                for (WallPart part : wall.getParts()) {
-                    if (part.contains(x, y)) {
+            for (WallPattern wallPatterns : walls) {
+                for (WallPart wallPart : wallPatterns.getParts()) {
+                    float dx = Math.abs(wallPart.getX() - x);
+                    float dy = Math.abs(wallPart.getY() - y);
+                    float distance = (float) Math.sqrt(dx * dx + dy * dy);
+                    float radius = PICKUP_RADIUS + 50;
+                    if (distance < radius) {
                         insideWall = true;
                         break;
                     }
@@ -48,17 +52,18 @@ public class ServerPickup {
                     break;
                 }
             }
-
-
-            if (!insideWall) {
-                List<Integer> temp = new ArrayList<>() {{
-                    add(x);
-                    add(y);
-                }};
-                if (!pickupPositions.contains(temp)) {
-                    pickupPositions.add(temp);
-                    return createRandomPickup(x, y, walls);
+            boolean tooClose = false;
+            for (List<Integer> position : pickupPositions) {
+                double distance = Vector2.dst2(x, y, position.get(0), position.get(1));
+                if (distance < MIN_DISTANCE * MIN_DISTANCE) {
+                    tooClose = true;
+                    break;
                 }
+            }
+            if (!insideWall && !tooClose) {
+                List<Integer> temp = Arrays.asList(x, y);
+                pickupPositions.add(temp);
+                return createRandomPickup(x, y, walls);
             }
         }
     }

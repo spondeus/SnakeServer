@@ -86,6 +86,8 @@ public class ServerSocket extends WebSocketServer {
     }
 
     private final int gameEndCode = 999;
+
+    WallMessage wallMessage;
     @Autowired
     Repository pointRepository;
 
@@ -191,7 +193,7 @@ public class ServerSocket extends WebSocketServer {
 
                 }
 
-                WallMessage wallMessage = new WallMessage(Wall.spawnWalls());
+                wallMessage = new WallMessage(Wall.spawnWalls());
                 if(isWalls){
                     for (var x : clients
                     ) {
@@ -275,17 +277,10 @@ public class ServerSocket extends WebSocketServer {
             return;
         }
 
-
-        WallMessage wallMessage = null;
-        if (type.startsWith("pickup")) {
-            wallMessage = new WallMessage(Wall.spawnWalls());
-            wallMessage.setWallList(wallMessage.getWallList());
-        }
-
         // process body
         JsonObject innerJson;
         if (type.startsWith("snake")) snakeMsgHandler(jsonObject, clientId, type);
-        else if (type.startsWith("pickup")) pickupMsgHandler(jsonObject, type, clientId, wallMessage);
+        else if (type.startsWith("pickup")) pickupMsgHandler(jsonObject, type, clientId);
         else if (type.equals("death")) dieMsgHandler(jsonObject, (long) clientId);
         else if (type.equals("score")) scoreMsgHandler(jsonObject, clientId);
         else if (type.equals("points")) pointsMsgHandler(clientId);
@@ -350,7 +345,7 @@ public class ServerSocket extends WebSocketServer {
         saveService.savePlayerScore(playerId, points[intClientId]);
     }
 
-    private void pickupMsgHandler(JsonObject jsonObject, String type, int clientId, WallMessage walls) {
+    private void pickupMsgHandler(JsonObject jsonObject, String type, int clientId) {
 
         if (type.equals("pickupRemove")) {
             int id = jsonObject.getAsJsonPrimitive("id").getAsInt();
@@ -373,7 +368,7 @@ public class ServerSocket extends WebSocketServer {
             System.out.println(pickups().size());
             if (pickups().size() < minPickup) {
                 for (int i = 0; i < 10 - pickups().size(); i++) {
-                    val newPickup = pickupsClass.newPickup(walls.getWallList());
+                    val newPickup = pickupsClass.newPickup(wallMessage.getWallList());
                     writeMsg(0, newPickup);
                     pickupsClass.addPickup(newPickup);
                 }
