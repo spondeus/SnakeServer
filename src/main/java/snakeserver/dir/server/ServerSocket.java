@@ -10,6 +10,8 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import snakeserver.dir.model.Repository;
 import snakeserver.dir.save.SaveService;
@@ -21,6 +23,7 @@ import snakeserver.dir.server.message.pickups.PickupRemove;
 import snakeserver.dir.server.message.pickups.ServerPickup;
 import snakeserver.dir.server.message.pickups.*;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -29,6 +32,26 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class ServerSocket extends WebSocketServer {
+
+    private boolean isWalls = true;
+    @EventListener(ApplicationReadyEvent.class)
+    public void CONSOLE() throws IOException, InterruptedException
+    {
+        val scn = new Scanner(System.in);
+        while (true){
+            val com = scn.nextLine();
+            switch (com){
+                case "wall_disable" -> {
+                    isWalls = false;
+                    System.out.println("Disable walls");
+                }
+                case "wall_enable" -> {
+                    isWalls = true;
+                    System.out.println("Enabled walls");
+                }
+            }
+        }
+    }
 
     public int lobbySize = 1;   // LOBBY SIZE
 
@@ -169,9 +192,11 @@ public class ServerSocket extends WebSocketServer {
                 }
 
                 WallMessage wallMessage = new WallMessage(Wall.spawnWalls());
-                for (var x : clients
-                ) {
-                    writeMsg(x.getId(), wallMessage);
+                if(isWalls){
+                    for (var x : clients
+                    ) {
+                        writeMsg(x.getId(), wallMessage);
+                    }
                 }
 
                 pickupsClass = new ServerPickup();
