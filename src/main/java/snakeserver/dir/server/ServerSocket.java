@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class ServerSocket extends WebSocketServer {
 
-    public int lobbySize = 3;   // LOBBY SIZE
+    public int lobbySize = 2;   // LOBBY SIZE
 
     public static ServerSocket socket;
 
@@ -86,9 +86,9 @@ public class ServerSocket extends WebSocketServer {
         System.out.println("Client connected: " + clientAddress);
         val newClient = new Client(clientAddress, webSocket);
         newClient.setId(ids.size());
-        if (playerController.playerIpPlayerIdMap.isEmpty()){
+        if (playerController.playerIpPlayerIdMap.isEmpty()) {
             clientIdPlayerIdMap.put(ids.size(), 1L);
-        }else{
+        } else {
             clientIdPlayerIdMap.put(ids.size(), playerController.playerIpPlayerIdMap.get(clientAddress.getAddress().toString()));
         }
         ids.add(ids.size());
@@ -115,7 +115,7 @@ public class ServerSocket extends WebSocketServer {
     public void onClose(WebSocket webSocket, int i, String s, boolean b) {
         val clientAddress = webSocket.getRemoteSocketAddress();
 
-        for(var c: clients){
+        for (var c : clients) {
             c.getWebSocket().close();
         }
 //        for (var x : clients){
@@ -272,41 +272,41 @@ public class ServerSocket extends WebSocketServer {
         Death dieMessage = gson.fromJson(jsonObject, Death.class);
         writeMsg((int) (long) clientId, dieMessage);
         diedSnakes[(int) (long) clientId] = true;
-        int deadSnakes = 0;
-        for (boolean dead : diedSnakes) {
-            if (dead) deadSnakes++;
-            writeMsg((int) (long) clientId, dieMessage);
-            diedSnakes[(int) (long) clientId] = true;
-            int alive = lobbySize;
-            for (boolean living : diedSnakes) {
-                if (living) alive--;
-            }
-            if (alive == 1) {
-                Message msg = new Message();
-                msg.setId(gameEndCode);
-                writeMsg(gameEndCode, msg);    // game end message
-                TimerTask removeLastSnake = new TimerTask() {
-                    @Override
-                    public void run() {
-                        Message msg = new Message();
-                        msg.setId(gameEndCode + 1);
-                        writeMsg(gameEndCode + 1, msg);     // return to main menu message
-                        try {
-                            Thread.sleep(4000);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                        for (var c : clients){
-                            c.getWebSocket().close();
-                        }
-                    }
-                };
-                Timer timer = new Timer();
-                long delay = 5000;
-                timer.schedule(removeLastSnake, delay);
-            } else if (alive == 0) winner(clientId, clientIdPlayerIdMap.get((int) (long) clientId));
+//        int deadSnakes = 0;
+//        for (boolean dead : diedSnakes) {
+//            if (dead) deadSnakes++;
+//            writeMsg((int) (long) clientId, dieMessage);
+//            diedSnakes[(int) (long) clientId] = true;
+        int alive = lobbySize;
+        for (boolean living : diedSnakes) {
+            if (living) alive--;
         }
+        if (alive == 1) {
+            Message msg = new Message();
+            msg.setId(gameEndCode);
+            writeMsg(gameEndCode, msg);    // game end message
+            TimerTask removeLastSnake = new TimerTask() {
+                @Override
+                public void run() {
+                    Message msg = new Message();
+                    msg.setId(gameEndCode + 1);
+                    writeMsg(gameEndCode + 1, msg);     // return to main menu message
+                    try {
+                        Thread.sleep(4000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    for (var c : clients) {
+                        c.getWebSocket().close();
+                    }
+                }
+            };
+            Timer timer = new Timer();
+            long delay = 5000;
+            timer.schedule(removeLastSnake, delay);
+        } else if (alive == 0) winner(clientId, clientIdPlayerIdMap.get((int) (long) clientId));
     }
+
 
     private void winner(Long clientId, Long playerId) {
         saveService.saveGame();
