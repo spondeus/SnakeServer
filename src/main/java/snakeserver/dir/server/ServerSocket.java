@@ -181,6 +181,7 @@ public class ServerSocket extends WebSocketServer {
                 for (var p : pickups())
                     writeMsg(p.getPickUpId(), p);
 
+
                 started = true;
                 diedSnakes = new boolean[lobbySize];
             }
