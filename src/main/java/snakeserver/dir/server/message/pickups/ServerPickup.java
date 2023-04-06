@@ -38,7 +38,7 @@ public class ServerPickup {
 
             Rectangle rectangle=new Rectangle(x,y,60,60);
 
-            final int MIN_DISTANCE = 50;
+            final int MIN_DISTANCE = 80;
 
             boolean insideWall = false;
             for (WallPattern wallPatterns : walls) {
