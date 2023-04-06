@@ -1,5 +1,6 @@
 package snakeserver.dir.server.message.pickups;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.SnapshotArray;
 import lombok.val;
@@ -30,23 +31,27 @@ public class ServerPickup {
         final int PICKUP_RADIUS = 10;
 
         Random random = new Random();
-
+        outer:
         while (true) {
             int x = random.nextInt(padding, WIDTH - padding);
             int y = random.nextInt(padding, HEIGHT - padding);
+
+            Rectangle rectangle=new Rectangle(x,y,60,60);
+
             final int MIN_DISTANCE = 50;
 
             boolean insideWall = false;
             for (WallPattern wallPatterns : walls) {
                 for (WallPart wallPart : wallPatterns.getParts()) {
-                    float dx = Math.abs(wallPart.getX() - x);
-                    float dy = Math.abs(wallPart.getY() - y);
-                    float distance = (float) Math.sqrt(dx * dx + dy * dy);
-                    float radius = PICKUP_RADIUS + 50;
-                    if (distance < radius) {
-                        insideWall = true;
-                        break;
-                    }
+                    if(rectangle.overlaps(wallPart)) continue outer;
+//                    float dx = Math.abs(wallPart.getX() - x);
+//                    float dy = Math.abs(wallPart.getY() - y);
+//                    float distance = (float) Math.sqrt(dx * dx + dy * dy);
+//                    float radius = PICKUP_RADIUS + 50;
+//                    if (distance < radius) {
+//                        insideWall = true;
+//                        break;
+//                    }
                 }
                 if (insideWall) {
                     break;
